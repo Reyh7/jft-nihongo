@@ -1,0 +1,769 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>JFT Basic Nihongo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* Layout concept: a study notebook. One column, big kana and kanji as the main visual,
+   bottom tab bar with one kanji per tab. Indigo ink on cool paper. */
+:root{
+  --paper:#F1F3F9; --panel:#FFFFFF; --ink:#1A2246; --ink2:#4B557D; --line:#D6DBEA;
+  --accent:#2A3A8F; --accent-ink:#FFFFFF; --soft:#E4E8F7; --gold:#9A6B0C;
+  --ok:#1D7A4B; --ok-bg:#E2F4EA; --bad:#B0352E; --bad-bg:#FBE7E5;
+  --display:"Shippori Mincho B1","Shippori Mincho","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic","Noto Sans JP",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0D1230; --panel:#161D44; --ink:#E9ECFA; --ink2:#A4ACD3; --line:#2A3366;
+  --accent:#93A3FF; --accent-ink:#0D1230; --soft:#1F2857; --gold:#E3B24C;
+  --ok:#62D096; --ok-bg:#133B2B; --bad:#FF8F86; --bad-bg:#4A1E22; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0D1230; --panel:#161D44; --ink:#E9ECFA; --ink2:#A4ACD3; --line:#2A3366;
+  --accent:#93A3FF; --accent-ink:#0D1230; --soft:#1F2857; --gold:#E3B24C;
+  --ok:#62D096; --ok-bg:#133B2B; --bad:#FF8F86; --bad-bg:#4A1E22; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;
+  padding-block:20px 104px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3,p{margin:0}
+h2{font-family:var(--display);font-size:1.5rem;line-height:1.25;text-wrap:balance}
+h3{font-size:1.02rem;line-height:1.35;text-wrap:balance}
+.jp{font-family:var(--display)}
+.eyebrow{font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+.muted{color:var(--ink2)}
+.small{font-size:.88rem}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.hero{display:flex;flex-direction:column;gap:6px;padding-top:6px}
+.hero h1{font-family:var(--display);font-weight:700;font-size:clamp(64px,24vw,124px);line-height:1;color:var(--accent);letter-spacing:.02em}
+.hero .lede{max-width:46ch;color:var(--ink2)}
+
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;min-width:0}
+.stat b{display:block;font-family:var(--display);font-size:1.7rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{font-size:.78rem;color:var(--ink2)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 18px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-weight:700}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.block{width:100%}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.bars{display:flex;flex-direction:column;gap:12px}
+.bar-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;font-size:.9rem}
+.bar-row .track{grid-column:1/-1;height:8px;border-radius:99px;background:var(--soft);overflow:hidden}
+.bar-row .fill{height:100%;background:var(--accent);border-radius:99px}
+.bar-row b{font-variant-numeric:tabular-nums}
+
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.chip{flex:0 0 auto;min-height:38px;padding:6px 14px;border-radius:99px;border:1px solid var(--line);background:var(--panel);font-size:.92rem;font-weight:500}
+.chip.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+
+.kgrid{display:grid;gap:8px}
+.kgrid.c5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.kgrid.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.kcell{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:68px;padding:6px 2px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.kcell .k{font-family:var(--display);font-size:1.7rem;line-height:1.1}
+.kcell .r{font-size:.74rem;color:var(--ink2)}
+.kcell.empty{border-style:dashed;background:transparent;visibility:hidden}
+
+.note{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:.92rem}
+.note b{color:var(--gold)}
+
+.vlist{display:flex;flex-direction:column}
+.vitem{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);background:none;border-left:0;border-right:0;border-top:0;text-align:left;width:100%}
+.vitem:last-child{border-bottom:0}
+.vitem .w{font-family:var(--display);font-size:1.25rem}
+.vitem .rd{font-size:.82rem;color:var(--ink2);margin-left:8px;font-family:var(--body)}
+.vitem .m{grid-column:1;font-size:.92rem;color:var(--ink2)}
+.vitem .sp{grid-row:1/3;grid-column:2;font-size:.8rem;color:var(--accent);font-weight:700}
+
+details.g{border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+details.g summary{list-style:none;cursor:pointer;padding:14px 16px;font-weight:700;display:flex;justify-content:space-between;gap:10px;align-items:center}
+details.g summary::-webkit-details-marker{display:none}
+details.g summary::after{content:"+";font-size:1.3rem;color:var(--accent)}
+details.g[open] summary::after{content:"−"}
+details.g .gb{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
+.ex{border-left:3px solid var(--accent);padding:2px 0 2px 12px}
+.ex .j{font-family:var(--display);font-size:1.1rem}
+.ex .t{font-size:.88rem;color:var(--ink2)}
+
+.phr{display:grid;grid-template-columns:minmax(0,1fr);gap:0}
+.phr button{display:flex;flex-direction:column;align-items:flex-start;gap:0;text-align:left;padding:10px 0;border:0;border-bottom:1px solid var(--line);background:none;width:100%}
+.phr button:last-child{border-bottom:0}
+.phr .j{font-family:var(--display);font-size:1.15rem}
+.phr .t{font-size:.88rem;color:var(--ink2)}
+.dlg{display:flex;flex-direction:column;gap:10px}
+.line{display:grid;grid-template-columns:4.6rem minmax(0,1fr);gap:8px}
+.line .who{font-size:.78rem;color:var(--gold);font-weight:700;padding-top:4px}
+.line .j{font-family:var(--display)}
+.line .t{font-size:.86rem;color:var(--ink2)}
+
+.kanji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.kj{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kj .big{font-family:var(--display);font-size:2.6rem;line-height:1.1;color:var(--accent)}
+.kj .rd{font-size:.82rem;overflow-wrap:anywhere}
+.kj .mn{font-size:.88rem;color:var(--ink2)}
+
+.fc{min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;padding:24px 16px;background:var(--panel);border:1px solid var(--line);border-radius:14px;width:100%}
+.fc .big{font-family:var(--display);font-size:clamp(2.2rem,11vw,3.4rem);line-height:1.15;overflow-wrap:anywhere}
+.fc .rd{font-size:1.1rem;color:var(--accent);font-weight:700}
+.fc .mn{font-size:1.1rem}
+.fc .hint{font-size:.8rem;color:var(--ink2)}
+
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.88rem}
+.prog{height:6px;background:var(--soft);border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--accent)}
+.tag{display:inline-block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--gold)}
+.qtext{font-size:1.12rem;line-height:1.5}
+.doc{white-space:pre-line;font-family:var(--display);font-size:1.12rem;line-height:1.7;border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--soft)}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:10px;align-items:center;text-align:left;width:100%;min-height:52px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel)}
+.opt .l{display:grid;place-items:center;width:2rem;height:2rem;border-radius:50%;background:var(--soft);font-weight:700;font-size:.85rem}
+.opt .tx{overflow-wrap:anywhere}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg)}
+.opt.bad{border-color:var(--bad);background:var(--bad-bg)}
+.opt.dim{opacity:.6}
+.fb{border-radius:10px;padding:12px 14px;font-size:.95rem}
+.fb.ok{background:var(--ok-bg)}
+.fb.bad{background:var(--bad-bg)}
+.fb b.o{color:var(--ok)}.fb b.b{color:var(--bad)}
+.score{font-family:var(--display);font-size:4rem;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
+.rev{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:2px}
+
+.menu{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.mi{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center;text-align:left;padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:var(--panel);width:100%}
+.mi .a{font-weight:700}.mi .b{font-size:.86rem;color:var(--ink2)}
+.mi .go{grid-row:1/3;grid-column:2;color:var(--accent);font-weight:700}
+.mi.main{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.mi.main .b,.mi.main .go{color:var(--accent-ink);opacity:.9}
+
+table.t{width:100%;border-collapse:collapse;font-size:.92rem}
+table.t th,table.t td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.tw{overflow-x:auto}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--panel);border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+  padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+nav.tabs a{display:flex;flex-direction:column;align-items:center;gap:0;padding:4px 2px;text-decoration:none;color:var(--ink2);border-radius:8px;min-height:50px;justify-content:center}
+nav.tabs a .kj2{font-family:var(--display);font-size:1.35rem;line-height:1.1}
+nav.tabs a .lb{font-size:.7rem;font-weight:700}
+nav.tabs a[aria-current="page"]{color:var(--accent)}
+nav.tabs a[aria-current="page"] .kj2{border-bottom:3px solid var(--accent)}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:99px;font-size:.88rem;z-index:30;max-width:90vw}
+/* Semua teks Jepang memakai satu jenis huruf (gothic) agar sama dengan soal */
+.kcell .k,.vitem .w,.ex .j,.phr .j,.line .j,.kj .big,.fc .big,.doc,.jp,nav.tabs a .kj2{font-family:var(--body);font-weight:500}
+.kj .big{font-weight:700}
+@media (prefers-reduced-motion:no-preference){.fill,.prog i{transition:width .4s ease}}
+nav.tabs{grid-template-columns:repeat(7,minmax(0,1fr))}nav.tabs a .lb{font-size:.62rem}.bub{padding:10px 14px;border-radius:12px;white-space:pre-wrap;background:var(--panel);border:1px solid var(--line)}.bub.user{background:var(--soft)}.ta{width:100%;font:inherit;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+@media (min-width:560px){.menu{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+
+<div class="wrap" id="app"></div>
+<nav class="tabs" aria-label="Menu utama" id="nav"></nav>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Data: tipe soal ---------- */
+var TYPES={
+  m:{n:"Moji · Goi",d:"Aksara dan kosakata"},
+  k:{n:"Kaiwa · Hyōgen",d:"Percakapan dan ekspresi"},
+  c:{n:"Chōkai",d:"Menyimak"},
+  d:{n:"Dokkai",d:"Membaca"}
+};
+
+/* ---------- Data: kana ---------- */
+var KANA_BASIC="あ:a い:i う:u え:e お:o|か:ka き:ki く:ku け:ke こ:ko|さ:sa し:shi す:su せ:se そ:so|た:ta ち:chi つ:tsu て:te と:to|な:na に:ni ぬ:nu ね:ne の:no|は:ha ひ:hi ふ:fu へ:he ほ:ho|ま:ma み:mi む:mu め:me も:mo|や:ya _ ゆ:yu _ よ:yo|ら:ra り:ri る:ru れ:re ろ:ro|わ:wa _ _ _ を:o|ん:n _ _ _ _";
+var KANA_DAK="が:ga ぎ:gi ぐ:gu げ:ge ご:go|ざ:za じ:ji ず:zu ぜ:ze ぞ:zo|だ:da ぢ:ji づ:zu で:de ど:do|ば:ba び:bi ぶ:bu べ:be ぼ:bo|ぱ:pa ぴ:pi ぷ:pu ぺ:pe ぽ:po";
+var KANA_YOU="きゃ:kya きゅ:kyu きょ:kyo|しゃ:sha しゅ:shu しょ:sho|ちゃ:cha ちゅ:chu ちょ:cho|にゃ:nya にゅ:nyu にょ:nyo|ひゃ:hya ひゅ:hyu ひょ:hyo|みゃ:mya みゅ:myu みょ:myo|りゃ:rya りゅ:ryu りょ:ryo|ぎゃ:gya ぎゅ:gyu ぎょ:gyo|じゃ:ja じゅ:ju じょ:jo|びゃ:bya びゅ:byu びょ:byo|ぴゃ:pya ぴゅ:pyu ぴょ:pyo";
+
+function toKata(s){return Array.from(s).map(function(c){var n=c.charCodeAt(0);return(n>=0x3041&&n<=0x3096)?String.fromCharCode(n+0x60):c}).join("")}
+function parseKana(src){var cells=[];src.split("|").forEach(function(r){r.split(" ").forEach(function(c){if(c==="_")cells.push(null);else{var p=c.split(":");cells.push({k:p[0],r:p[1]})}})});return cells}
+
+/* ---------- Data: kosakata ---------- */
+var THEMES=[
+ {id:"salam",n:"Salam",w:[
+  "おはようございます||selamat pagi","こんにちは||selamat siang / halo","こんばんは||selamat malam","ありがとうございます||terima kasih",
+  "すみません||permisi / maaf","ごめんなさい||maaf (akrab)","おねがいします||tolong / mohon","いただきます||ucapan sebelum makan",
+  "ごちそうさまでした||ucapan setelah makan","はじめまして||senang bertemu (pertama kali)","よろしくおねがいします||mohon bantuannya","さようなら||selamat tinggal",
+  "おやすみなさい||selamat tidur","いってきます||saya berangkat","いってらっしゃい||hati-hati di jalan","ただいま||saya pulang",
+  "おかえりなさい||selamat datang kembali","おつかれさまです||terima kasih atas kerja kerasnya","おさきにしつれいします||permisi, saya pulang duluan","おだいじに||semoga lekas sembuh","いらっしゃいませ||selamat datang (di toko)","どういたしまして||sama-sama","おめでとうございます||selamat","どうぞ||silakan","ごちゅうもん||pesanan (mau pesan apa?)","もしもし||halo (telepon)","わかりました||saya mengerti / baik","ください||tolong beri","ちょっと…||agak … (penolakan halus)"]},
+ {id:"angka",n:"Angka & hitungan",w:[
+  "一|いち|satu","二|に|dua","三|さん|tiga","四|よん / し|empat","五|ご|lima","六|ろく|enam","七|なな / しち|tujuh","八|はち|delapan","九|きゅう / く|sembilan","十|じゅう|sepuluh",
+  "百|ひゃく|seratus","千|せん|seribu","万|まん|sepuluh ribu","円|えん|yen","〜時|じ|jam (pukul)","〜分|ふん / ぷん|menit",
+  "〜人|にん|orang (hitungan)","一人|ひとり|satu orang","二人|ふたり|dua orang","〜個|こ|buah (benda kecil)","〜枚|まい|lembar (benda tipis)","〜本|ほん|batang (benda panjang)","〜冊|さつ|buku (hitungan)","〜台|だい|unit (mesin, kendaraan)",
+  "ひとつ||satu buah","ふたつ||dua buah","みっつ||tiga buah","五百|ごひゃく|lima ratus","三百|さんびゃく|tiga ratus","六百|ろっぴゃく|enam ratus","八百|はっぴゃく|delapan ratus","三千|さんぜん|tiga ribu","八千|はっせん|delapan ribu","千五百円|せんごひゃくえん|1.500 yen","二千円|にせんえん|2.000 yen","七百円|ななひゃくえん|700 yen","四百円|よんひゃくえん|400 yen","百五十円|ひゃくごじゅうえん|150 yen","五十円|ごじゅうえん|50 yen","十分|じゅっぷん|10 menit","二十分|にじゅっぷん|20 menit","一時間|いちじかん|1 jam (durasi)","四人|よにん|empat orang","〜回|かい|kali (frekuensi)","三回|さんかい|tiga kali"]},
+ {id:"waktu",n:"Waktu",w:[
+  "今日|きょう|hari ini","明日|あした|besok","昨日|きのう|kemarin","毎日|まいにち|setiap hari","今|いま|sekarang","朝|あさ|pagi","昼|ひる|siang","夜|よる|malam",
+  "午前|ごぜん|pagi (AM)","午後|ごご|siang/sore (PM)","今週|こんしゅう|minggu ini","来週|らいしゅう|minggu depan","先月|せんげつ|bulan lalu","来年|らいねん|tahun depan","毎朝|まいあさ|setiap pagi","半|はん|setengah (jam)",
+  "月曜日|げつようび|Senin","火曜日|かようび|Selasa","水曜日|すいようび|Rabu","木曜日|もくようび|Kamis","金曜日|きんようび|Jumat","土曜日|どようび|Sabtu","日曜日|にちようび|Minggu"]},
+ {id:"orang",n:"Orang & keluarga",w:[
+  "私|わたし|saya","友達|ともだち|teman","家族|かぞく|keluarga","父|ちち|ayah (saya)","母|はは|ibu (saya)","お父さん|おとうさん|ayah (orang lain)","お母さん|おかあさん|ibu (orang lain)",
+  "兄|あに|kakak laki-laki (saya)","姉|あね|kakak perempuan (saya)","弟|おとうと|adik laki-laki (saya)","妹|いもうと|adik perempuan (saya)","先生|せんせい|guru / dokter","学生|がくせい|pelajar / mahasiswa","会社員|かいしゃいん|karyawan",
+  "店員|てんいん|pegawai toko","医者|いしゃ|dokter","〜さん||Tn./Ny./Sdr. (sapaan)","外国人|がいこくじん|orang asing","子ども|こども|anak"]},
+ {id:"makan",n:"Makanan & minuman",w:[
+  "ごはん||nasi / makan","水|みず|air","お茶|おちゃ|teh","肉|にく|daging","魚|さかな|ikan","野菜|やさい|sayur","卵|たまご|telur","パン||roti","牛乳|ぎゅうにゅう|susu",
+  "果物|くだもの|buah","弁当|べんとう|bekal / bento","朝ごはん|あさごはん|sarapan","昼ごはん|ひるごはん|makan siang","晩ごはん|ばんごはん|makan malam","食べる|たべる|makan","飲む|のむ|minum","おいしい||enak",
+  "からい||pedas","あまい||manis","しょくどう||kantin / rumah makan","メニュー||menu","ラーメン||ramen","コーヒー||kopi","りんご||apel","ケーキ||kue","ぎょうざ||gyoza","食事|しょくじ|makan / hidangan","昼休み|ひるやすみ|istirahat siang"]},
+ {id:"belanja",n:"Belanja & uang",w:[
+  "店|みせ|toko","スーパー||supermarket","コンビニ||minimarket 24 jam","高い|たかい|mahal / tinggi","安い|やすい|murah","いくら||berapa harganya","買う|かう|membeli","売る|うる|menjual",
+  "袋|ふくろ|kantong","レシート||struk","現金|げんきん|uang tunai","カード||kartu","割引|わりびき|diskon","税込|ぜいこみ|termasuk pajak","お釣り|おつり|uang kembalian","支払う|しはらう|membayar",
+  "財布|さいふ|dompet","値段|ねだん|harga","品物|しなもの|barang","ほしい||ingin (benda)"]},
+ {id:"jalan",n:"Transportasi & arah",w:[
+  "電車|でんしゃ|kereta listrik","駅|えき|stasiun","バス||bus","バス停|バスてい|halte bus","地下鉄|ちかてつ|kereta bawah tanah","飛行機|ひこうき|pesawat","自転車|じてんしゃ|sepeda","車|くるま|mobil",
+  "切符|きっぷ|tiket","乗る|のる|naik","降りる|おりる|turun","乗り換える|のりかえる|berganti (kereta/bus)","右|みぎ|kanan","左|ひだり|kiri","まっすぐ||lurus","交差点|こうさてん|persimpangan",
+  "道|みち|jalan","出口|でぐち|pintu keluar","入口|いりぐち|pintu masuk","北口|きたぐち|pintu utara","〜番線|ばんせん|jalur nomor ...","遅れる|おくれる|terlambat"]},
+ {id:"tempat",n:"Tempat & rumah",w:[
+  "家|いえ|rumah","部屋|へや|kamar","台所|だいどころ|dapur","トイレ||toilet","窓|まど|jendela","ドア||pintu","電気|でんき|listrik / lampu","学校|がっこう|sekolah",
+  "病院|びょういん|rumah sakit","銀行|ぎんこう|bank","郵便局|ゆうびんきょく|kantor pos","図書館|としょかん|perpustakaan","公園|こうえん|taman","会社|かいしゃ|perusahaan","工場|こうじょう|pabrik","空港|くうこう|bandara",
+  "市役所|しやくしょ|kantor pemerintah kota","机|つくえ|meja","椅子|いす|kursi","冷蔵庫|れいぞうこ|kulkas","荷物|にもつ|barang bawaan","本|ほん|buku","ペン||pena","靴|くつ|sepatu","写真|しゃしん|foto","映画|えいが|film"]},
+ {id:"kerja",n:"Pekerjaan",w:[
+  "仕事|しごと|pekerjaan","会議|かいぎ|rapat","休み|やすみ|libur / istirahat","休む|やすむ|beristirahat / tidak masuk","残業|ざんぎょう|lembur","給料|きゅうりょう|gaji","上司|じょうし|atasan","同僚|どうりょう|rekan kerja",
+  "履歴書|りれきしょ|CV / riwayat hidup","締め切り|しめきり|tenggat","報告|ほうこく|laporan","連絡|れんらく|menghubungi / kabar","相談|そうだん|konsultasi","出勤|しゅっきん|masuk kerja","遅刻|ちこく|terlambat datang","作業|さぎょう|pekerjaan / operasi",
+  "安全|あんぜん|aman","危険|きけん|bahaya","制服|せいふく|seragam","ヘルメット||helm","手伝う|てつだう|membantu","働く|はたらく|bekerja"]},
+ {id:"sehat",n:"Kesehatan",w:[
+  "病気|びょうき|sakit (penyakit)","薬|くすり|obat","熱|ねつ|demam","頭|あたま|kepala","痛い|いたい|sakit (nyeri)","おなか||perut","風邪|かぜ|flu / pilek","咳|せき|batuk",
+  "元気|げんき|sehat / bersemangat","大丈夫|だいじょうぶ|tidak apa-apa","保険証|ほけんしょう|kartu asuransi kesehatan","予約|よやく|reservasi","具合が悪い|ぐあいがわるい|kurang sehat","けが||luka / cedera","歯|は|gigi","目|め|mata"]},
+ {id:"cuaca",n:"Cuaca & musim",w:[
+  "天気|てんき|cuaca","雨|あめ|hujan","雪|ゆき|salju","晴れ|はれ|cerah","曇り|くもり|berawan","暑い|あつい|panas","寒い|さむい|dingin","涼しい|すずしい|sejuk",
+  "風|かぜ|angin","春|はる|musim semi","夏|なつ|musim panas","秋|あき|musim gugur","冬|ふゆ|musim dingin","台風|たいふう|topan","地震|じしん|gempa bumi","傘|かさ|payung"]},
+ {id:"kata",n:"Kata kerja & sifat",w:[
+  "行く|いく|pergi","来る|くる|datang","帰る|かえる|pulang","見る|みる|melihat","聞く|きく|mendengar / bertanya","話す|はなす|berbicara","読む|よむ|membaca","書く|かく|menulis",
+  "起きる|おきる|bangun","寝る|ねる|tidur","勉強する|べんきょうする|belajar","待つ|まつ|menunggu","教える|おしえる|mengajar / memberi tahu","使う|つかう|menggunakan","作る|つくる|membuat","開ける|あける|membuka",
+  "閉める|しめる|menutup","始まる|はじまる|mulai","終わる|おわる|selesai","大きい|おおきい|besar","小さい|ちいさい|kecil","新しい|あたらしい|baru","古い|ふるい|lama","近い|ちかい|dekat",
+  "遠い|とおい|jauh","早い|はやい|cepat / awal","遅い|おそい|lambat / lambat datang","多い|おおい|banyak","少ない|すくない|sedikit","忙しい|いそがしい|sibuk","難しい|むずかしい|sulit","簡単|かんたん|mudah","降る|ふる|turun (hujan/salju)","通る|とおる|melewati","入る|はいる|masuk","持つ|もつ|membawa","借りる|かりる|meminjam","撮る|とる|mengambil (foto)","脱ぐ|ぬぐ|melepas (sepatu/pakaian)","吸う|すう|menghirup / merokok","変わる|かわる|berubah","集まる|あつまる|berkumpul","出す|だす|mengeluarkan / membuang","広い|ひろい|luas","長い|ながい|panjang","楽しい|たのしい|menyenangkan","面白い|おもしろい|menarik","危ない|あぶない|berbahaya","同じ|おなじ|sama","あげる||memberi","終わり|おわり|akhir / selesai","うち||rumah (うち / いえ)","ロビー||lobi","お金|おかね|uang","名前|なまえ|nama","お願い|おねがい|permohonan","電話する|でんわする|menelepon"]},
+ {id:"tanda",n:"Pengumuman & tanda",w:[
+  "禁煙|きんえん|dilarang merokok","たばこ||rokok","営業時間|えいぎょうじかん|jam buka","毎週|まいしゅう|setiap minggu","発|はつ|berangkat dari","着|ちゃく|tiba","場所|ばしょ|tempat","住所|じゅうしょ|alamat","電話|でんわ|telepon","一日|いちにち|satu hari","次|つぎ|berikutnya","あさって||lusa","掃除|そうじ|bersih-bersih","ゴミ||sampah","後ろ|うしろ|belakang","前|まえ|depan / sebelum","北口|きたぐち|pintu utara","〜までに||paling lambat sebelum","〜のあとに||setelah …","おしらせ||pengumuman"]}
+];
+var VOC=[];
+THEMES.forEach(function(t){t.w.forEach(function(s){var p=s.split("|");VOC.push({th:t.id,jp:p[0],rd:p[1],id:p[2]})})});
+
+/* ---------- Data: tata bahasa ---------- */
+var GRAM=[
+ {t:"AはBです · A adalah B",r:"は dibaca “wa”. Bentuk negatif: ではありません / じゃありません. Untuk bertanya, tambahkan か di akhir kalimat.",
+  ex:[["わたしは インドネシアじんです。","Saya orang Indonesia."],["たなかさんは せんせいでは ありません。","Tn. Tanaka bukan guru."],["あなたは がくせいですか。","Apakah Anda pelajar?"]]},
+ {t:"こ・そ・あ・ど · Kata tunjuk",r:"これ・それ・あれ・どれ untuk benda. この・その・あの・どの dipakai sebelum kata benda. ここ・そこ・あそこ・どこ untuk tempat. こ = dekat pembicara, そ = dekat lawan bicara, あ = jauh dari keduanya, ど = pertanyaan.",
+  ex:[["これは なんですか。","Ini apa?"],["そのかばんは わたしのです。","Tas itu milik saya."],["トイレは あそこです。","Toilet ada di sana."]]},
+ {t:"Partikel I · を に で へ",r:"を menandai objek. に menandai waktu, tujuan, atau lokasi keberadaan. で menandai tempat melakukan aksi atau alat. へ menandai arah (dibaca “e”).",
+  ex:[["パンを たべます。","Saya makan roti."],["七時に おきます。","Saya bangun pukul tujuh."],["学校で べんきょうします。","Saya belajar di sekolah."],["バスで かいしゃへ いきます。","Saya pergi ke kantor naik bus."]]},
+ {t:"Partikel II · と も の から〜まで",r:"と = bersama / dan. も = juga. の = milik atau hubungan. から〜まで = dari … sampai …. 〜までに = paling lambat sebelum ….",
+  ex:[["ともだちと えいがを みます。","Saya menonton film bersama teman."],["わたしも がくせいです。","Saya juga pelajar."],["これは わたしの ほんです。","Ini buku saya."],["九時から 五時まで はたらきます。","Saya bekerja dari jam 9 sampai jam 5."],["八時までに ゴミを だしてください。","Tolong buang sampah paling lambat jam 8."]]},
+ {t:"あります・います · Ada",r:"あります untuk benda tak bernyawa dan tumbuhan. います untuk manusia dan hewan. Pola: tempat に benda が あります.",
+  ex:[["つくえの うえに ほんが あります。","Di atas meja ada buku."],["へやに ねこが います。","Di kamar ada kucing."],["えきは どこに ありますか。","Stasiun ada di mana?"]]},
+ {t:"Bentuk ます · Sopan",r:"Sekarang/akan: 〜ます. Negatif: 〜ません. Lampau: 〜ました. Lampau negatif: 〜ませんでした.",
+  ex:[["まいにち コーヒーを のみます。","Setiap hari saya minum kopi."],["きのうは しごとを しませんでした。","Kemarin saya tidak bekerja."],["けさ なにを たべましたか。","Tadi pagi makan apa?"]]},
+ {t:"Kata sifat い dan な",r:"Kata sifat い: たかい → たかくないです → たかかったです. Kata sifat な: しずかです → しずかじゃありません → しずかでした. Sebelum kata benda: たかい ほん, しずかな まち.",
+  ex:[["この りょうりは おいしいです。","Masakan ini enak."],["ここは しずかじゃ ありません。","Tempat ini tidak tenang."],["きのうは あつかったです。","Kemarin panas."]]},
+ {t:"Ajakan dan keinginan",r:"〜ませんか = maukah …? (mengajak). 〜ましょう = ayo …. 〜たいです = ingin … (ganti ます dengan たい). 〜ましょうか = mau saya …? (menawarkan bantuan).",
+  ex:[["いっしょに ひるごはんを たべませんか。","Mau makan siang bersama?"],["いきましょう。","Ayo pergi."],["にほんで はたらきたいです。","Saya ingin bekerja di Jepang."],["にもつを もちましょうか。","Mau saya bawakan barangnya?"]]},
+ {t:"Bentuk て · Permintaan dan izin",r:"〜てください = tolong …. 〜ています = sedang … / keadaan berlanjut. 〜てもいいです = boleh …. 〜てはいけません = dilarang …. Bentuk て: く→いて, ぐ→いで, む・ぶ・ぬ→んで, う・つ・る→って, す→して; 食べる→食べて, する→して, 来る→きて.",
+  ex:[["ここに なまえを かいてください。","Tolong tulis nama di sini."],["いま しょくじを して います。","Sekarang sedang makan."],["しゃしんを とっても いいですか。","Bolehkah saya mengambil foto?"],["ここで たばこを すっては いけません。","Dilarang merokok di sini."]]},
+ {t:"Bentuk ない · Larangan dan kewajiban",r:"〜ないでください = tolong jangan …. 〜なければなりません = harus …. Bentuk ない: う-verb ganti akhiran う-row menjadi あ-row + ない (かく → かかない), る-verb buang る (たべる → たべない), する → しない, くる → こない.",
+  ex:[["ここに くるまを とめないでください。","Tolong jangan parkir mobil di sini."],["まいにち くすりを のまなければ なりません。","Saya harus minum obat setiap hari."]]},
+ {t:"Pengalaman dan urutan",r:"〜たことがあります = pernah …. 〜たり〜たりします = melakukan … dan … (contoh kegiatan). 〜てから = setelah …. 〜のあとに = setelah (kata benda) ….",
+  ex:[["にほんへ いったことが あります。","Saya pernah pergi ke Jepang."],["やすみの ひは そうじしたり、かいものしたり します。","Di hari libur saya bersih-bersih, belanja, dan sebagainya."],["ごはんを たべてから、くすりを のみます。","Setelah makan, saya minum obat."],["しょくじの あとに くすりを のみます。","Setelah makan saya minum obat."]]},
+ {t:"Perbandingan",r:"AはBより〜 = A lebih … dari B. AのほうがBより〜 = A lebih … daripada B. いちばん = paling.",
+  ex:[["でんしゃは バスより はやいです。","Kereta lebih cepat daripada bus."],["くだものの なかで りんごが いちばん すきです。","Di antara buah, saya paling suka apel."]]},
+ {t:"Alasan dan kontras",r:"〜から = karena …, jadi …. 〜が = tetapi …. 〜ので = karena … (lebih halus, sering untuk alasan sopan).",
+  ex:[["あついですから、まどを あけます。","Karena panas, saya buka jendela."],["にほんごは むずかしいですが、おもしろいです。","Bahasa Jepang sulit, tetapi menarik."],["あたまが いたいので、やすみます。","Karena kepala sakit, saya istirahat."]]},
+ {t:"Kemampuan, rencana, sebelum",r:"〜ことができます = bisa …. 〜つもりです = berencana …. 〜まえに = sebelum ….",
+  ex:[["わたしは にほんごを はなすことが できます。","Saya bisa berbicara bahasa Jepang."],["らいねん くにへ かえるつもりです。","Tahun depan saya berencana pulang ke negara saya."],["ねるまえに はを みがきます。","Sebelum tidur saya sikat gigi."]]},
+ {t:"Tujuan: 〜に いきます",r:"Kata kerja bentuk ます tanpa ます + に + いきます / きます / かえります = pergi / datang / pulang untuk melakukan sesuatu. Benda tujuan memakai を.",
+  ex:[["えいがを みに いきます。","Saya pergi untuk menonton film."],["かいものに いきます。","Saya pergi belanja."],["にほんへ べんきょうしに きました。","Saya datang ke Jepang untuk belajar."]]},
+ {t:"Angka, harga, dan jam",r:"Ratusan: ひゃく, にひゃく, さんびゃく, よんひゃく, ごひゃく, ろっぴゃく, ななひゃく, はっぴゃく, きゅうひゃく. Ribuan: せん, にせん, さんぜん, よんせん, ごせん, ろくせん, ななせん, はっせん, きゅうせん. Jam: 4 = よじ, 7 = しちじ, 9 = くじ (bukan よんじ, ななじ, きゅうじ). Menit: いっぷん, にふん, さんぷん, よんぷん, ごふん, ろっぷん, ななふん, はっぷん, きゅうふん, じゅっぷん. 半 (はん) = setengah.",
+  ex:[["せんごひゃくえん","1.500 yen"],["さんぜんはっぴゃくえん","3.800 yen"],["しちじはん","Pukul 7.30"],["にじゅっぷん","20 menit"]]}
+];
+
+/* ---------- Data: ekspresi dan dialog ---------- */
+var PHR=[
+ ["もういちど おねがいします。","Tolong ulangi sekali lagi."],["ゆっくり はなしてください。","Tolong bicara pelan-pelan."],["わかりません。","Saya tidak mengerti."],
+ ["ちょっと まってください。","Tolong tunggu sebentar."],["しょうしょう おまちください。","Mohon tunggu sebentar (sopan)."],["おくれて すみません。","Maaf saya terlambat."],
+ ["てつだいましょうか。","Mau saya bantu?"],["ここに すわっても いいですか。","Boleh saya duduk di sini?"],["どうしましたか。","Ada apa? / Kenapa?"],
+ ["あたまが いたいです。","Kepala saya sakit."],["〜は どこですか。","… ada di mana?"],["〜を ください。","Tolong beri saya …."],
+ ["いくらですか。","Berapa harganya?"],["カードで はらえますか。","Bisa bayar pakai kartu?"],["それでは、また あした。","Kalau begitu, sampai besok."]
+];
+var DLG=[
+ {t:"Di toko",l:[["てんいん","いらっしゃいませ。","Selamat datang."],["わたし","すみません、この シャツは いくらですか。","Permisi, kemeja ini berapa?"],["てんいん","二千円です。","Dua ribu yen."],["わたし","ちょっと たかいですね。もっと やすいのは ありますか。","Agak mahal ya. Ada yang lebih murah?"],["てんいん","はい、こちらは 千五百円です。","Ada, yang ini seribu lima ratus yen."],["わたし","じゃ、それを ください。","Kalau begitu, saya ambil itu."]]},
+ {t:"Di stasiun",l:[["わたし","すみません、さくらえきへ いきたいです。","Permisi, saya ingin ke Stasiun Sakura."],["えきいん","三番線の 電車に のってください。","Silakan naik kereta di jalur 3."],["わたし","なんぷんぐらい かかりますか。","Kira-kira berapa menit?"],["えきいん","二十分ぐらいです。","Sekitar dua puluh menit."],["わたし","ありがとうございます。","Terima kasih."]]},
+ {t:"Di tempat kerja",l:[["わたし","おはようございます。きょうは あたまが いたいので、びょういんへ いっても いいですか。","Selamat pagi. Hari ini kepala saya sakit, bolehkah saya pergi ke rumah sakit?"],["じょうし","だいじょうぶですか。はい、いってください。","Tidak apa-apa? Ya, silakan pergi."],["わたし","ありがとうございます。あとで れんらくします。","Terima kasih. Nanti saya kabari."],["じょうし","おだいじに。","Semoga lekas sembuh."]]},
+ {t:"Di restoran",l:[["てんいん","ごちゅうもんは？","Mau pesan apa?"],["わたし","ラーメンを ひとつ おねがいします。","Ramen satu, tolong."],["てんいん","おのみものは？","Minumnya?"],["わたし","みずを ください。","Air putih, tolong."],["てんいん","かしこまりました。しょうしょう おまちください。","Baik. Mohon tunggu sebentar."]]}
+];
+
+/* ---------- Data: kanji ---------- */
+var KANJI=[
+ ["日","ニチ / ひ","hari, matahari"],["月","ゲツ / つき","bulan"],["火","カ / ひ","api"],["水","スイ / みず","air"],["木","モク / き","pohon"],["金","キン / かね","emas, uang"],["土","ド / つち","tanah"],
+ ["人","ジン・ニン / ひと","orang"],["大","ダイ / おお(きい)","besar"],["小","ショウ / ちい(さい)","kecil"],["中","チュウ / なか","tengah, dalam"],["上","ジョウ / うえ","atas"],["下","カ / した","bawah"],
+ ["山","サン / やま","gunung"],["川","セン / かわ","sungai"],["口","コウ / くち","mulut"],["目","モク / め","mata"],["手","シュ / て","tangan"],["足","ソク / あし","kaki"],
+ ["学","ガク / まな(ぶ)","belajar"],["校","コウ","sekolah"],["先","セン / さき","dulu, ujung"],["生","セイ / う(まれる)","hidup, lahir"],["年","ネン / とし","tahun"],["時","ジ / とき","waktu, jam"],
+ ["分","ブン・フン / わ(かる)","menit, paham"],["今","コン / いま","sekarang"],["何","カ / なに・なん","apa"],["円","エン","yen"],["本","ホン / もと","buku, dasar"],["国","コク / くに","negara"],
+ ["外","ガイ / そと","luar"],["車","シャ / くるま","mobil"],["駅","エキ","stasiun"],["店","テン / みせ","toko"],["食","ショク / た(べる)","makan"],["飲","イン / の(む)","minum"],
+ ["見","ケン / み(る)","melihat"],["行","コウ / い(く)","pergi"],["来","ライ / く(る)","datang"],["出","シュツ / で(る)","keluar"],["入","ニュウ / はい(る)","masuk"],["休","キュウ / やす(む)","istirahat"],
+ ["右","ウ / みぎ","kanan"],["左","サ / ひだり","kiri"],["北","ホク / きた","utara"],["南","ナン / みなみ","selatan"],["東","トウ / ひがし","timur"],["西","セイ / にし","barat"],
+ ["田","デン / た","sawah (sering di nama: 田中)"],["男","ダン / おとこ","laki-laki"],["女","ジョ / おんな","perempuan"],["子","シ / こ","anak"],["父","フ / ちち","ayah"],["母","ボ / はは","ibu"],["友","ユウ / とも","teman"],
+ ["話","ワ / はな(す)","berbicara"],["聞","ブン / き(く)","mendengar, bertanya"],["読","ドク / よ(む)","membaca"],["書","ショ / か(く)","menulis"],["買","バイ / か(う)","membeli"],
+ ["高","コウ / たか(い)","tinggi, mahal"],["安","アン / やす(い)","murah, aman"],["新","シン / あたら(しい)","baru"],["古","コ / ふる(い)","lama"],["長","チョウ / なが(い)","panjang"],["多","タ / おお(い)","banyak"],["少","ショウ / すく(ない)","sedikit"],
+ ["雨","ウ / あめ","hujan"],["天","テン","langit"],["気","キ","semangat, udara"],["電","デン","listrik"],["魚","ギョ / さかな","ikan"],["肉","ニク","daging"],["茶","チャ / サ","teh"],["花","カ / はな","bunga"],
+ ["同","ドウ / おな(じ)","sama"],["前","ゼン / まえ","depan, sebelum"],["後","ゴ / うし(ろ)・あと","belakang, setelah"],["半","ハン","setengah"],["毎","マイ","setiap"],["週","シュウ","minggu"],["朝","チョウ / あさ","pagi"],["昼","チュウ / ひる","siang"],["夜","ヤ / よる","malam"],["午","ゴ","tengah hari (午前, 午後)"],["間","カン / あいだ","antara, jangka waktu"],
+ ["会","カイ / あ(う)","bertemu, pertemuan"],["社","シャ","perusahaan, kuil"],["仕","シ","melayani"],["事","ジ / こと","hal, urusan (仕事)"],["工","コウ","kerajinan, industri"],["場","ジョウ / ば","tempat"],["住","ジュウ / す(む)","tinggal"],["所","ショ / ところ","tempat"],
+ ["薬","ヤク / くすり","obat"],["病","ビョウ / や(む)","penyakit"],["院","イン","lembaga (病院)"],["頭","トウ / あたま","kepala"],["痛","ツウ / いた(い)","sakit, nyeri"],["熱","ネツ / あつ(い)","demam, panas"],["風","フウ / かぜ","angin"],["歯","シ / は","gigi"]
+];
+
+/* ---------- Data: tabel kata kerja [arti, kamus, baca, ます, て, ない, た] ---------- */
+var VERBS=[
+ ["pergi","行く","いく","いきます","いって","いかない","いった"],["datang","来る","くる","きます","きて","こない","きた"],["pulang","帰る","かえる","かえります","かえって","かえらない","かえった"],
+ ["melihat","見る","みる","みます","みて","みない","みた"],["mendengar","聞く","きく","ききます","きいて","きかない","きいた"],["berbicara","話す","はなす","はなします","はなして","はなさない","はなした"],
+ ["membaca","読む","よむ","よみます","よんで","よまない","よんだ"],["menulis","書く","かく","かきます","かいて","かかない","かいた"],["makan","食べる","たべる","たべます","たべて","たべない","たべた"],
+ ["minum","飲む","のむ","のみます","のんで","のまない","のんだ"],["melakukan","する","する","します","して","しない","した"],["bangun","起きる","おきる","おきます","おきて","おきない","おきた"],
+ ["tidur","寝る","ねる","ねます","ねて","ねない","ねた"],["bekerja","働く","はたらく","はたらきます","はたらいて","はたらかない","はたらいた"],["menunggu","待つ","まつ","まちます","まって","またない","まった"],
+ ["mengajar","教える","おしえる","おしえます","おしえて","おしえない","おしえた"],["menggunakan","使う","つかう","つかいます","つかって","つかわない","つかった"],["membuat","作る","つくる","つくります","つくって","つくらない","つくった"],
+ ["membuka","開ける","あける","あけます","あけて","あけない","あけた"],["menutup","閉める","しめる","しめます","しめて","しめない","しめた"],["mulai","始まる","はじまる","はじまります","はじまって","はじまらない","はじまった"],
+ ["selesai","終わる","おわる","おわります","おわって","おわらない","おわった"],["membeli","買う","かう","かいます","かって","かわない","かった"],["naik","乗る","のる","のります","のって","のらない","のった"],
+ ["turun","降りる","おりる","おります","おりて","おりない","おりた"],["masuk","入る","はいる","はいります","はいって","はいらない","はいった"],["mengeluarkan","出す","だす","だします","だして","ださない","だした"],
+ ["turun (hujan)","降る","ふる","ふります","ふって","ふらない","ふった"],["meminjam","借りる","かりる","かります","かりて","かりない","かりた"],["melepas","脱ぐ","ぬぐ","ぬぎます","ぬいで","ぬがない","ぬいだ"],
+ ["merokok","吸う","すう","すいます","すって","すわない","すった"],["mengambil foto","撮る","とる","とります","とって","とらない","とった"],["berkumpul","集まる","あつまる","あつまります","あつまって","あつまらない","あつまった"],
+ ["membawa","持つ","もつ","もちます","もって","もたない","もった"],["istirahat","休む","やすむ","やすみます","やすんで","やすまない","やすんだ"],["membantu","手伝う","てつだう","てつだいます","てつだって","てつだわない","てつだった"],
+ ["berubah","変わる","かわる","かわります","かわって","かわらない","かわった"]
+];
+
+/* ---------- Bank soal (o[0] = jawaban benar, urutan diacak saat tampil) ---------- */
+var QB=[
+/* Moji · Goi */
+{t:"m",q:"Cara baca kanji 「駅」 adalah …",o:["えき","ゆき","いき","えい"],e:"駅 dibaca えき, artinya stasiun. ゆき adalah 雪 (salju)."},
+{t:"m",q:"Cara baca 「水曜日」 adalah …",o:["すいようび","みずようび","すいよび","もくようび"],e:"水 dibaca すい dalam nama hari. 木曜日 adalah もくようび (Kamis)."},
+{t:"m",q:"Pilih kata yang tepat.\nこのりんごは ひとつ 五十円です。とても ( ) です。",o:["やすい","たかい","おもい","ふるい"],e:"50 yen untuk satu apel itu sangat murah, jadi やすい."},
+{t:"m",q:"Pilih tulisan katakana untuk “kopi”.",o:["コーヒー","ユーヒー","コーヒ","ココヒー"],e:"Kopi ditulis コーヒー. Tanda panjang ー memperpanjang bunyi vokal."},
+{t:"m",q:"Cara baca 「先生」 adalah …",o:["せんせい","せんぜい","ぜんせい","せんしょう"],e:"先生 dibaca せんせい (guru)."},
+{t:"m",q:"Cara baca 「休み」 adalah …",o:["やすみ","ひるみ","きゅうみ","ゆうみ"],e:"休み dibaca やすみ (libur, istirahat). Kata kerjanya 休む (やすむ)."},
+{t:"m",q:"Cara baca 「毎日」 adalah …",o:["まいにち","まいひ","まいじつ","ごとひ"],e:"毎日 dibaca まいにち (setiap hari)."},
+{t:"m",q:"Cara baca 「七時半」 adalah …",o:["しちじはん","ななじはん","しちじなか","なのじはん"],e:"Untuk jam 7 yang dipakai adalah しちじ. 半 (はん) berarti setengah, jadi pukul 7.30."},
+{t:"m",q:"Cara baca 「出口」 adalah …",o:["でぐち","いりぐち","でくち","しゅっこう"],e:"出口 dibaca でぐち (pintu keluar). Lawannya 入口 (いりぐち)."},
+{t:"m",q:"Cara baca 「天気」 adalah …",o:["てんき","でんき","てんぎ","でんぎ"],e:"天気 = てんき (cuaca). 電気 = でんき (listrik, lampu). Hati-hati, mirip."},
+{t:"m",q:"Pilih kata yang tepat.\nしごとが おわりました。うちへ ( )。",o:["かえります","はじまります","はいります","あけます"],e:"Setelah pekerjaan selesai, pulang ke rumah: かえります."},
+{t:"m",q:"Pilih kata yang tepat.\nびょういんへ いきます。( ) が いたいです。",o:["あたま","ほん","くつ","えき"],e:"Pergi ke rumah sakit karena sakit, yang cocok adalah bagian tubuh: あたま (kepala)."},
+{t:"m",q:"Pilih yang tepat.\nりんごを ( ) かいました。",o:["みっつ","さんまい","さんにん","さんさつ"],e:"Apel dihitung dengan hitungan umum: ひとつ, ふたつ, みっつ. まい untuk benda tipis, にん untuk orang, さつ untuk buku."},
+{t:"m",q:"Cara baca 「二人」 adalah …",o:["ふたり","ににん","ふたにん","にひと"],e:"Satu dan dua orang punya bacaan khusus: ひとり, ふたり. Mulai tiga: さんにん."},
+{t:"m",q:"Pilih kanji yang benar untuk でんしゃ (kereta).",o:["電車","電者","雷車","電東"],e:"Kereta listrik ditulis 電車: 電 (listrik) + 車 (kendaraan)."},
+{t:"m",q:"Lawan kata 「大きい」 adalah …",o:["ちいさい","ひろい","ながい","ふるい"],e:"大きい (besar) lawannya 小さい (kecil)."},
+/* Kaiwa · Hyogen */
+{t:"k",q:"Anda bertemu rekan kerja di pagi hari. Apa yang Anda ucapkan?",o:["おはようございます。","おやすみなさい。","さようなら。","いただきます。"],e:"Salam pagi: おはようございます. おやすみなさい dipakai sebelum tidur."},
+{t:"k",q:"Anda akan mulai makan. Apa yang Anda ucapkan?",o:["いただきます。","ごちそうさまでした。","ただいま。","いってきます。"],e:"Sebelum makan: いただきます. Setelah makan: ごちそうさまでした."},
+{t:"k",q:"Anda pulang dan membuka pintu rumah. Apa yang Anda ucapkan?",o:["ただいま。","いってきます。","おかえりなさい。","いらっしゃいませ。"],e:"Orang yang pulang berkata ただいま. Orang rumah menjawab おかえりなさい."},
+{t:"k",q:"Di toko, Anda ingin tahu harga barang. Apa yang Anda tanyakan?",o:["これは いくらですか。","これは なんじですか。","これは どこですか。","これは だれですか。"],e:"いくら dipakai untuk menanyakan harga. なんじ = jam berapa, どこ = di mana, だれ = siapa."},
+{t:"k",q:"Anda tidak mengerti ucapan lawan bicara dan ingin ia mengulang. Apa yang Anda ucapkan?",o:["もういちど おねがいします。","ありがとうございます。","いただきます。","おつかれさまです。"],e:"Untuk meminta pengulangan: もういちど おねがいします."},
+{t:"k",q:"Anda terlambat masuk rapat. Apa yang Anda ucapkan?",o:["おくれて すみません。","おさきに しつれいします。","いってらっしゃい。","おめでとうございます。"],e:"Minta maaf karena terlambat: おくれて すみません."},
+{t:"k",q:"Rekan Anda berkata「おさきに しつれいします。」Apa jawaban yang tepat?",o:["おつかれさまでした。","いただきます。","はじめまして。","いらっしゃいませ。"],e:"Saat rekan pulang lebih dulu, jawabannya おつかれさまでした."},
+{t:"k",q:"Anda bertemu seseorang untuk pertama kali. Apa yang Anda ucapkan?",o:["はじめまして。","おひさしぶりです。","ただいま。","おげんきで。"],e:"Pertama kali bertemu: はじめまして. おひさしぶりです dipakai untuk orang yang lama tidak bertemu."},
+{t:"k",q:"Di restoran Anda minta air putih.\nすみません、みずを ( )。",o:["ください","たべます","あげます","あります"],e:"Meminta sesuatu: 〜を ください. Cara lain yang sopan adalah 〜を おねがいします."},
+{t:"k",q:"Teman mengajak: 「いっしょに ごはんを たべませんか。」Anda tidak bisa hari ini. Jawaban sopan yang tepat?",o:["すみません、きょうは ちょっと…。","はい、たべました。","いいえ、たべます。","ごちそうさまでした。"],e:"Menolak halus dalam bahasa Jepang biasanya: すみません、きょうは ちょっと…."},
+{t:"k",q:"Dokter bertanya 「どうしましたか。」Apa jawaban yang tepat?",o:["あたまが いたいです。","いってきます。","どうぞ。","ありがとうございます。"],e:"どうしましたか = ada apa? Jawab dengan keluhan: あたまが いたいです."},
+{t:"k",q:"Pegawai toko berkata 「すこし まってください。」Apa jawaban yang tepat?",o:["はい、わかりました。","いいえ、どういたしまして。","いってきます。","いただきます。"],e:"Setelah diminta menunggu, jawab はい、わかりました (baik, saya mengerti)."},
+{t:"k",q:"Seseorang berkata「ありがとうございます。」Apa jawaban yang tepat?",o:["どういたしまして。","すみません。","いただきます。","おねがいします。"],e:"Jawaban terima kasih: どういたしまして (sama-sama)."},
+{t:"k",q:"Anda meminjam pena dari teman:「ペンを かりても いいですか。」Jawaban teman yang tepat?",o:["はい、どうぞ。","はい、かりました。","いいえ、どういたしまして。","はい、おねがいです。"],e:"Saat mengizinkan, katakan はい、どうぞ (silakan)."},
+{t:"k",q:"Rekan menawarkan: 「にもつを もちましょうか。」Anda ingin dibantu. Jawaban yang tepat?",o:["ありがとうございます。おねがいします。","ごちそうさまでした。","おめでとうございます。","さようなら。"],e:"〜ましょうか = mau saya …? Terima tawaran dengan ありがとうございます。おねがいします."},
+{t:"k",q:"Teman bertanya: 「おげんきですか。」Jawaban yang tepat?",o:["はい、げんきです。あなたは？","はい、いただきます。","はい、いってきます。","いいえ、おげんきです。"],e:"Jawab tentang diri sendiri dengan げんきです, lalu balik bertanya あなたは？."},
+/* Chokai */
+{t:"c",say:"えきは まっすぐ いって、みぎに あります。",q:"Stasiun ada di mana?",o:["Lurus lalu kanan","Lurus lalu kiri","Belok kiri lalu lurus","Di sebelah kanan tempat ini"],e:"まっすぐ = lurus, みぎ = kanan. Stasiun ada di kanan setelah berjalan lurus."},
+{t:"c",say:"この シャツは せんごひゃくえんです。",q:"Berapa harga kemeja?",o:["1.500 yen","5.100 yen","15.000 yen","1.050 yen"],e:"せん (1000) + ごひゃく (500) = 1.500 yen."},
+{t:"c",say:"かいぎは にじはんから はじまります。",q:"Rapat mulai jam berapa?",o:["02.30","03.20","02.00","12.30"],e:"にじ = jam 2, はん = setengah. Jadi 02.30."},
+{t:"c",say:"あしたは あめが ふります。さむいです。",q:"Bagaimana cuaca besok?",o:["Hujan dan dingin","Cerah dan panas","Berawan dan hangat","Salju dan dingin"],e:"あめ = hujan, さむい = dingin."},
+{t:"c",say:"わたしは まいあさ ろくじに おきて、ごはんを たべて、しちじに いえを でます。",q:"Jam berapa ia keluar rumah?",o:["Jam 7","Jam 6","Jam 8","Jam 5"],e:"ろくじ (jam 6) bangun, しちじ (jam 7) keluar rumah."},
+{t:"c",say:"A:なにを のみますか。\nB:わたしは おちゃを ください。",q:"B minum apa?",o:["Teh","Kopi","Air putih","Susu"],e:"おちゃ = teh."},
+{t:"c",say:"たなかさんは きのう びょうきでした。きょうは げんきです。",q:"Bagaimana kondisi Tn. Tanaka hari ini?",o:["Sehat","Sakit","Libur","Terlambat"],e:"きのう = kemarin (sakit). きょうは げんき = hari ini sehat."},
+{t:"c",say:"このバスは えきの まえを とおります。うしろの ドアから のってください。",q:"Naik bus dari pintu mana?",o:["Pintu belakang","Pintu depan","Pintu samping","Pintu mana saja"],e:"うしろ = belakang. Silakan naik dari pintu belakang."},
+{t:"c",say:"もしもし、すずきです。いま でんしゃが おくれています。十分ぐらい おくれます。",q:"Mengapa Suzuki terlambat?",o:["Keretanya terlambat","Ia sakit","Ia bangun kesiangan","Ia salah jalan"],e:"でんしゃが おくれています = keretanya terlambat."},
+{t:"c",say:"へやに つくえが ひとつと いすが ふたつ あります。",q:"Ada berapa kursi di kamar?",o:["2","1","3","4"],e:"いす = kursi, ふたつ = dua buah."},
+{t:"c",say:"しごとは くじから ごじまでです。ひるやすみは いちじかんです。",q:"Pekerjaan berakhir jam berapa?",o:["Jam 5","Jam 9","Jam 6","Jam 4"],e:"くじ から ごじ まで = dari jam 9 sampai jam 5."},
+{t:"c",say:"にほんごの べんきょうは たのしいですが、かんじは むずかしいです。",q:"Apa yang sulit menurut pembicara?",o:["Kanji","Bahasa Jepang secara umum","Ujian","Tata bahasa"],e:"〜が = tetapi. かんじは むずかしい = kanji sulit."},
+{t:"c",say:"ここで しゃしんを とらないでください。",q:"Apa yang dilarang?",o:["Mengambil foto","Makan","Masuk","Berbicara"],e:"しゃしん = foto. 〜ないでください = tolong jangan …."},
+{t:"c",say:"かぞくは よにんです。ちちと ははと あねと わたしです。",q:"Siapa saja anggota keluarganya?",o:["Ayah, ibu, kakak perempuan, saya","Ayah, ibu, adik laki-laki, saya","Ayah, ibu, saya","Ibu, kakak, adik, saya"],e:"ちち = ayah, はは = ibu, あね = kakak perempuan, jumlahnya empat orang."},
+{t:"c",say:"にちようびに ともだちと えいがを みに いきます。",q:"Apa rencana hari Minggu?",o:["Menonton film dengan teman","Berbelanja sendiri","Belajar di rumah","Pergi ke rumah sakit"],e:"にちようび = Minggu. ともだちと = dengan teman. えいがを みに いきます = pergi menonton film."},
+{t:"c",say:"ゴミは げつようびと きんようびに だしてください。",q:"Hari apa membuang sampah?",o:["Senin dan Jumat","Selasa dan Kamis","Sabtu dan Minggu","Rabu dan Jumat"],e:"げつようび = Senin, きんようび = Jumat."},
+/* Dokkai */
+{t:"d",ctx:"しょくどう\nひるごはん 11:30〜13:30\n日曜日は やすみです",q:"Kapan kantin tutup?",o:["Hari Minggu","Hari Sabtu","Setiap sore","Pukul 11.30"],e:"日曜日は やすみ = hari Minggu libur."},
+{t:"d",ctx:"【おしらせ】\nあしたは そうじが あります。\n8:30に ロビーに あつまってください。",q:"Apa yang harus dilakukan besok?",o:["Berkumpul di lobi pukul 08.30","Pulang lebih awal","Membersihkan rumah sendiri","Libur seharian"],e:"あつまってください = tolong berkumpul. Tempat: ロビー, jam: 8:30."},
+{t:"d",ctx:"ここで くつを ぬいでください。",q:"Apa yang harus dilakukan di sini?",o:["Melepas sepatu","Memakai sepatu","Membeli sepatu","Mencuci sepatu"],e:"くつを ぬぐ = melepas sepatu."},
+{t:"d",ctx:"ここは きんえんです。\nたばこを すわないでください。",q:"Apa yang dilarang di tempat ini?",o:["Merokok","Makan","Berfoto","Parkir"],e:"きんえん = dilarang merokok. たばこを すう = merokok."},
+{t:"d",ctx:"スーパーあおぞら\n営業時間 9:00〜21:00\n毎週 水曜日 休み",q:"Kapan supermarket libur?",o:["Setiap Rabu","Setiap Selasa","Setiap Sabtu","Tidak pernah"],e:"毎週 水曜日 休み = setiap minggu hari Rabu libur."},
+{t:"d",ctx:"電車\n8:15 発 → 9:00 着",q:"Berapa lama perjalanan kereta?",o:["45 menit","15 menit","60 menit","75 menit"],e:"Berangkat 8:15, tiba 9:00, jadi 45 menit."},
+{t:"d",ctx:"田中さん、\nあしたの 会議は 3時から 4時に かわりました。\n場所は おなじです。",q:"Bagaimana rapat besok?",o:["Mulai jam 4 di tempat yang sama","Mulai jam 3 di tempat baru","Dibatalkan","Mulai jam 3 di tempat yang sama"],e:"3時から 4時に かわりました = berubah dari jam 3 ke jam 4. 場所は おなじ = tempat sama."},
+{t:"d",ctx:"ラーメン　700円\nぎょうざ　400円\nごはん　150円",q:"Berapa harga ramen dan gyoza?",o:["1.100 yen","850 yen","1.250 yen","550 yen"],e:"700 + 400 = 1.100 yen."},
+{t:"d",ctx:"あぶない！\nはいらないでください。",q:"Apa arti pengumuman ini?",o:["Berbahaya, dilarang masuk","Silakan masuk","Pintu masuk gratis","Tutup sampai besok"],e:"あぶない = berbahaya. はいらないでください = tolong jangan masuk."},
+{t:"d",ctx:"冷蔵庫に ケーキが あります。\nどうぞ 食べてください。",q:"Apa isi pesan ini?",o:["Kue di kulkas boleh dimakan","Kue sudah habis","Kue untuk dibawa pulang","Jangan buka kulkas"],e:"どうぞ 食べてください = silakan dimakan."},
+{t:"d",ctx:"わたしは 先月 日本に 来ました。\n工場で 働いています。\n毎日 とても 忙しいですが、仕事は おもしろいです。",q:"Bagaimana pekerjaan penulis?",o:["Menarik tetapi sibuk","Membosankan dan sibuk","Menarik dan santai","Sulit dan membosankan"],e:"忙しいですが = sibuk, tetapi. 仕事は おもしろい = pekerjaannya menarik."},
+{t:"d",ctx:"ゴミは 朝 8時までに 出してください。",q:"Kapan batas waktu mengeluarkan sampah?",o:["Sebelum jam 8 pagi","Setelah jam 8 malam","Jam 8 sore","Kapan saja"],e:"8時までに = paling lambat jam 8. 朝 = pagi."},
+{t:"d",ctx:"なまえ：＿＿＿＿＿＿\nじゅうしょ：＿＿＿＿＿＿\nでんわ：＿＿＿＿＿＿",q:"Apa yang ditulis di kolom 「でんわ」?",o:["Nomor telepon","Alamat","Nama","Tanggal lahir"],e:"でんわ = telepon. じゅうしょ = alamat."},
+{t:"d",ctx:"このバスは 駅の 北口から 出ます。",q:"Bus berangkat dari mana?",o:["Pintu utara stasiun","Pintu selatan stasiun","Dalam stasiun","Depan sekolah"],e:"北口 = pintu utara. 駅 = stasiun."},
+{t:"d",ctx:"あさって 工場は やすみです。\nつぎは 月曜日に 来てください。",q:"Kapan harus datang berikutnya?",o:["Hari Senin","Lusa","Besok","Hari Minggu"],e:"つぎは 月曜日に 来てください = berikutnya silakan datang hari Senin."},
+{t:"d",ctx:"薬は 一日 三回、\n食事の あとに のんでください。",q:"Kapan obat diminum?",o:["Setelah makan, tiga kali sehari","Sebelum makan, tiga kali sehari","Setelah makan, sekali sehari","Sebelum tidur saja"],e:"一日 三回 = tiga kali sehari. 食事の あとに = setelah makan."}
+];
+
+/* ---------- Penyimpanan progres ---------- */
+var KEY="jft-basic-progress-v1";
+function blank(){return{days:{},stats:{},known:{},wrong:[],plan:"free",until:"",ai:{d:"",n:0},acct:{n:"Pengguna",e:"",t:""}}}
+function load(){try{var r=localStorage.getItem(KEY);if(r){var p=JSON.parse(r),b=blank();for(var k in b)if(p[k]!==undefined)b[k]=p[k];return b}}catch(e){}return blank()}
+var P=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(P))}catch(e){}}
+function dkey(d){d=d||new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function streak(){var n=0,d=new Date();if(!P.days[dkey(d)])d.setDate(d.getDate()-1);while(P.days[dkey(d)]){n++;d.setDate(d.getDate()-1)}return n}
+
+/* ---------- Util ---------- */
+function $(s,r){return(r||document).querySelector(s)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuffle(arr,r){var a=arr.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(r()*(i+1));var x=a[i];a[i]=a[j];a[j]=x}return a}
+var toastT;
+function toast(m){var t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true},2400)}
+function jaVoice(){
+  try{var vs=speechSynthesis.getVoices();for(var i=0;i<vs.length;i++){if(vs[i].lang&&vs[i].lang.toLowerCase().replace("_","-").indexOf("ja")===0)return vs[i]}}catch(e){}
+  return null;
+}
+function speak(text,slow){
+  try{
+    if(!("speechSynthesis" in window)){toast("Browser ini tidak mendukung suara");return}
+    var u=new SpeechSynthesisUtterance(text);u.lang="ja-JP";u.rate=(slow||S.slow)?.6:.9;
+    var v=jaVoice();
+    if(v)u.voice=v;else toast("Suara Jepang belum terpasang. Lihat petunjuk di Beranda.");
+    speechSynthesis.cancel();speechSynthesis.speak(u);
+  }catch(e){toast("Suara tidak tersedia di perangkat ini")}
+}
+
+/* ---------- State ---------- */
+var S={mat:"kana",kana:"hira",vt:"salam",ct:"all",Q:null,deck:[],flip:false,slow:false,chat:[],busy:false,draft:"",pay:null};
+var TABS=[["beranda","家","Beranda"],["materi","学","Materi"],["kartu","札","Kartu"],["soal","問","Soal"],["ujian","試","Ujian"],["sensei","師","Sensei"],["akun","員","Akun"]];
+
+/* ---------- Views ---------- */
+function vHome(){
+  var st=streak(),done=P.days[dkey()],known=Object.keys(P.known).length;
+  var bars=Object.keys(TYPES).map(function(k){
+    var s=P.stats[k]||{c:0,t:0},pc=s.t?Math.round(s.c*100/s.t):0;
+    return '<div class="bar-row"><span>'+TYPES[k].n+' <span class="muted small">'+TYPES[k].d+'</span></span><b>'+(s.t?pc+'%':'–')+'</b><div class="track"><div class="fill" style="width:'+pc+'%"></div></div></div>';
+  }).join("");
+  return '<header class="hero"><p class="eyebrow">JFT-Basic · level A2</p><h1 lang="ja">日本語</h1>'+
+    '<p class="lede">Dari hiragana sampai soal latihan. Ada 10 soal baru setiap hari, dan paket FREE membuka materi dasar, Premium membuka semuanya.</p></header>'+
+    '<div class="stats"><div class="stat"><b>'+st+'</b><span>hari berturut-turut</span></div>'+
+    '<div class="stat"><b>'+(done?done.s+'/'+done.t:'–')+'</b><span>skor soal hari ini</span></div>'+
+    '<div class="stat"><b>'+known+'</b><span>dari '+VOC.length+' kata hafal</span></div></div>'+
+    '<section class="panel"><h3>Audio</h3><p class="muted small">Suara dibuat oleh perangkat Anda, bukan rekaman. Ketuk tes suara untuk memeriksa.</p><div class="row"><button class="btn" data-act="test">▶ Tes suara</button><button class="btn '+(S.slow?'primary':'')+'" data-act="slow">Kecepatan: '+(S.slow?'pelan':'normal')+'</button></div>'+
+    '<p class="muted small">Tidak ada suara? Pasang data suara bahasa Jepang di pengaturan text-to-speech perangkat (Android: Bahasa, lalu Output text-to-speech; iPhone: Aksesibilitas, lalu Konten Terucap, lalu Suara). Langkahnya bisa sedikit berbeda tiap perangkat.</p></section>'+
+    '<div class="menu"><button class="mi main" data-act="daily"><span class="a">'+(done?'Latihan soal harian lagi':'Mulai soal harian')+'</span><span class="b">'+(done?'Anda sudah menyelesaikannya hari ini':'10 soal dari 4 bagian ujian')+'</span><span class="go">→</span></button>'+
+    '<a class="mi" href="#materi" style="text-decoration:none;color:inherit"><span class="a">Buka materi</span><span class="b">Kana, kosakata, tata bahasa, percakapan, kanji</span><span class="go">→</span></a></div>'+
+    '<section class="panel"><h3>Akurasi per bagian</h3><div class="bars">'+bars+'</div>'+
+    ((Object.keys(P.stats).length)?'':'<p class="muted small">Belum ada latihan. Kerjakan soal harian pertama untuk mengisi grafik ini.</p>')+'</section>';
+}
+
+function kanaGrid(src,cols,mode){
+  var cells=parseKana(src);
+  return '<div class="kgrid c'+cols+'">'+cells.map(function(c){
+    if(!c)return '<div class="kcell empty"></div>';
+    var k=mode==="kata"?toKata(c.k):c.k;
+    return '<button class="kcell" data-act="say" data-t="'+esc(k)+'" aria-label="'+esc(c.r)+'"><span class="k" lang="ja">'+k+'</span><span class="r">'+c.r+'</span></button>';
+  }).join("")+'</div>';
+}
+function mKana(){
+  var m=S.kana;
+  return '<div class="chips" role="tablist"><button class="chip '+(m==="hira"?"on":"")+'" data-act="kana" data-v="hira">Hiragana ひらがな</button><button class="chip '+(m==="kata"?"on":"")+'" data-act="kana" data-v="kata">Katakana カタカナ</button></div>'+
+   '<p class="muted small">Ketuk huruf untuk mendengar bunyinya (jika perangkat mendukung suara bahasa Jepang).</p>'+
+   '<h3>Huruf dasar</h3>'+kanaGrid(KANA_BASIC,5,m)+
+   '<h3>Dakuten dan handakuten (゛ ゜)</h3>'+kanaGrid(KANA_DAK,5,m)+
+   '<h3>Gabungan dengan や ゆ よ kecil</h3>'+kanaGrid(KANA_YOU,3,m)+
+   '<div class="note"><b>Aturan penting.</b> つ kecil (っ / ッ) menggandakan konsonan berikutnya: きって “kitte”. Tanda ー pada katakana memanjangkan vokal: ラーメン. Pada hiragana, vokal panjang ditulis dengan huruf vokal tambahan: おかあさん, せんせい. ん dibaca “n” dan bisa berubah menjadi “m” sebelum b, p, m. は sebagai partikel dibaca “wa”, へ dibaca “e”, を dibaca “o”.</div>'+
+   (m==="kata"?'<div class="note"><b>Fungsi katakana.</b> Dipakai untuk kata serapan (コーヒー, バス), nama orang asing, dan penekanan. Contoh nama Indonesia: インドネシア.</div>':'');
+}
+function mVocab(){
+  var th=THEMES.filter(function(t){return t.id===S.vt})[0];
+  var chips=THEMES.map(function(t){return '<button class="chip '+(t.id===S.vt?"on":"")+'" data-act="vt" data-v="'+t.id+'">'+t.n+'</button>'}).join("");
+  var items=VOC.filter(function(v){return v.th===S.vt}).map(function(v){
+    var kn=P.known[v.jp]?' ✓':'';
+    return '<button class="vitem" data-act="say" data-t="'+esc(v.rd&&v.jp.indexOf("〜")<0?v.rd.split(" / ")[0]:v.jp.replace(/〜/g,""))+'"><span><span class="w" lang="ja">'+esc(v.jp)+'</span>'+(v.rd?'<span class="rd" lang="ja">'+esc(v.rd)+'</span>':'')+'</span><span class="m">'+esc(v.id)+'</span><span class="sp">'+(kn||'🔊').replace('🔊','Dengar')+'</span></button>';
+  }).join("");
+  return '<div class="chips">'+chips+'</div><section class="panel"><h3>'+th.n+' · '+th.w.length+' kata</h3><div class="vlist">'+items+'</div></section>'+
+    '<p class="muted small">Tanda ✓ muncul untuk kata yang sudah Anda tandai hafal di tab Kartu.</p>';
+}
+function mGram(){
+  return '<p class="muted small">Ketuk setiap pola untuk membuka aturan dan contoh. Pola ini mencakup tingkat A2 yang diujikan di JFT-Basic.</p>'+GRAM.slice(0,isPrem()?99:4).map(function(g){
+    return '<details class="g"><summary>'+esc(g.t)+'</summary><div class="gb"><p>'+esc(g.r)+'</p>'+g.ex.map(function(e){return '<div class="ex"><div class="j" lang="ja">'+esc(e[0])+'</div><div class="t">'+esc(e[1])+'</div></div>'}).join("")+'</div></details>';
+  }).join("")+(isPrem()?"":lockBox("Pola tata bahasa lainnya"));
+}
+function mConv(){
+  return '<section class="panel"><h3>Ungkapan yang sering muncul</h3><div class="phr">'+PHR.map(function(p){return '<button data-act="say" data-t="'+esc(p[0])+'"><span class="j" lang="ja">'+esc(p[0])+'</span><span class="t">'+esc(p[1])+'</span></button>'}).join("")+'</div></section>'+
+  DLG.map(function(d){return '<section class="panel"><div class="row" style="justify-content:space-between;align-items:center"><h3>Dialog · '+esc(d.t)+'</h3><button class="btn" data-act="say" data-t="'+esc(d.l.map(function(l){return l[1]}).join(" "))+'">▶ Putar dialog</button></div><div class="dlg">'+d.l.map(function(l){return '<div class="line"><span class="who">'+esc(l[0])+'</span><div><div class="j" lang="ja">'+esc(l[1])+'</div><div class="t">'+esc(l[2])+'</div></div></div>'}).join("")+'</div></section>'}).join("");
+}
+function mKanji(){
+  return '<p class="muted small">'+KANJI.length+' kanji dasar. Bacaan ON (katakana) dipakai dalam gabungan kanji, bacaan kun (hiragana) pada kata berdiri sendiri.</p><div class="kanji-grid">'+KANJI.map(function(k){return '<div class="kj"><span class="big" lang="ja">'+k[0]+'</span><span class="rd" lang="ja">'+esc(k[1])+'</span><span class="mn">'+esc(k[2])+'</span></div>'}).join("")+'</div>';
+}
+function mVerb(){
+  return '<p class="muted small">Soal sering memakai kata kerja dalam bentuk ます, て, ない, dan た. Geser tabel ke samping untuk melihat semua bentuk.</p>'+
+  '<div class="note"><b>Tiga kelompok.</b> る-verb (diakhiri え+る atau い+る, misalnya 食べる, 見る, 起きる): buang る, tambah ます / て / ない / た. Pengecualian yang tampak seperti る-verb tetapi u-verb: 帰る, 入る. U-verb (lainnya, misalnya 飲む, 書く, 待つ): ganti huruf akhir, lihat tabel. Tidak teratur: する, 来る, dan 行く (bentuk て-nya いって).</div>'+
+  '<div class="note"><b>Bentuk て dan た.</b> う・つ・る → って / った. む・ぶ・ぬ → んで / んだ. く → いて / いた. ぐ → いで / いだ. す → して / した. Bentuk ない: huruf akhir う-row menjadi あ-row + ない (書く → 書かない, 買う → 買わない).</div>'+
+  '<section class="panel"><div class="tw"><table class="t" style="min-width:560px"><thead><tr><th>Arti</th><th>Kamus</th><th>ます</th><th>て</th><th>ない</th><th>た</th></tr></thead><tbody>'+
+  VERBS.map(function(v){return '<tr><td>'+esc(v[0])+'</td><td lang="ja"><b>'+esc(v[1])+'</b>'+(v[1]!==v[2]?'<br><span class="muted small">'+esc(v[2])+'</span>':'')+'</td><td lang="ja">'+esc(v[3])+'</td><td lang="ja">'+esc(v[4])+'</td><td lang="ja">'+esc(v[5])+'</td><td lang="ja">'+esc(v[6])+'</td></tr>'}).join("")+
+  '</tbody></table></div></section>';
+}
+function vMateri(){
+  var tabs=[["kana","Kana"],["vocab","Kosakata"],["verb","Kata kerja"],["gram","Tata bahasa"],["conv","Percakapan"],["kanji","Kanji"]];
+  var lk=!isPrem()&&(S.mat==="verb"||S.mat==="kanji");var body=lk?function(){return lockBox(S.mat==="verb"?"Tabel kata kerja":"Daftar kanji")}:{kana:mKana,vocab:mVocab,verb:mVerb,gram:mGram,conv:mConv,kanji:mKanji}[S.mat];body=body();
+  return '<header><p class="eyebrow">Materi</p><h2>Belajar langkah demi langkah</h2></header>'+
+   '<div class="chips" role="tablist">'+tabs.map(function(t){return '<button class="chip '+(S.mat===t[0]?"on":"")+'" role="tab" aria-selected="'+(S.mat===t[0])+'" data-act="mat" data-v="'+t[0]+'">'+t[1]+'</button>'}).join("")+'</div>'+body;
+}
+
+/* Kartu */
+function deckFor(theme){
+  var idx=[];VOC.forEach(function(v,i){if((theme==="all"||v.th===theme)&&!P.known[v.jp])idx.push(i)});
+  return shuffle(idx,Math.random);
+}
+function vCards(){
+  var chips='<button class="chip '+(S.ct==="all"?"on":"")+'" data-act="ct" data-v="all">Semua</button>'+THEMES.map(function(t){return '<button class="chip '+(S.ct===t.id?"on":"")+'" data-act="ct" data-v="'+t.id+'">'+t.n+'</button>'}).join("");
+  var total=VOC.filter(function(v){return S.ct==="all"||v.th===S.ct}).length;
+  var kn=VOC.filter(function(v){return(S.ct==="all"||v.th===S.ct)&&P.known[v.jp]}).length;
+  var head='<header><p class="eyebrow">Kartu kosakata</p><h2>Ketuk kartu untuk membalik</h2></header><div class="chips">'+chips+'</div>'+
+    '<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="'+total+'" aria-valuenow="'+kn+'"><i style="width:'+(total?kn*100/total:0)+'%"></i></div><p class="muted small">'+kn+' dari '+total+' kata sudah hafal</p>';
+  if(!S.deck.length){
+    return head+'<section class="panel"><h3>Semua kartu di bagian ini sudah hafal</h3><p class="muted">Ulangi dari awal untuk menjaga ingatan, atau pilih tema lain.</p><button class="btn primary" data-act="creset">Ulangi dari awal</button></section>';
+  }
+  var v=VOC[S.deck[0]];
+  var face=S.flip?'<span class="rd" lang="ja">'+esc(v.rd||v.jp)+'</span><span class="mn">'+esc(v.id)+'</span>':'<span class="big" lang="ja">'+esc(v.jp)+'</span><span class="hint">Ketuk untuk melihat arti</span>';
+  return head+'<button class="fc" data-act="flip" aria-label="Kartu, ketuk untuk membalik">'+face+'</button>'+
+    '<div class="row"><button class="btn" data-act="say" data-t="'+esc(v.rd&&v.jp.indexOf("〜")<0?v.rd.split(" / ")[0]:v.jp.replace(/〜/g,""))+'">Dengar</button><button class="btn" data-act="again" style="flex:1">Ulangi nanti</button><button class="btn primary" data-act="got" style="flex:1">Hafal</button></div>'+
+    '<p class="muted small">Sisa di tumpukan: '+S.deck.length+' kartu</p>';
+}
+
+/* Soal */
+function idsOf(t){var a=[];QB.forEach(function(q,i){if(q.t===t)a.push(i)});return a}
+function build(ids,r){return ids.map(function(id){var q=QB[id];return{id:id,q:q,opts:shuffle(q.o.map(function(t,i){return{t:t,ok:i===0}}),r)}})}
+function startQuiz(mode,arg){
+  if(!isPrem()&&(mode==="sim"||(mode==="type"&&(arg==="c"||arg==="d")))){toast("Fitur Premium");go("akun");return}
+  var ids=[],label="",r=Math.random;
+  if(mode==="daily"){
+    r=rng(Number(dkey().replace(/-/g,"")));label="Soal harian";
+    var cnt={m:3,k:3,c:2,d:2};
+    ["m","k","c","d"].forEach(function(t){ids=ids.concat(shuffle(idsOf(t),r).slice(0,cnt[t]))});
+  }else if(mode==="type"){label="Latihan "+TYPES[arg].n;ids=shuffle(idsOf(arg),r).slice(0,10)}
+  else if(mode==="sim"){label="Simulasi mini";["m","k","c","d"].forEach(function(t){ids=ids.concat(shuffle(idsOf(t),r).slice(0,5))})}
+  else if(mode==="redo"){label="Ulang soal yang salah";ids=P.wrong.filter(function(i){return QB[i]}).slice(0,20)}
+  if(!ids.length){toast("Belum ada soal untuk dikerjakan");return}
+  S.Q={mode:mode,label:label,items:build(ids,r),i:0,picks:[],reveal:{},saved:false};
+  go("soal");
+}
+function vQuizMenu(){
+  var done=P.days[dkey()],w=P.wrong.filter(function(i){return QB[i]}).length;
+  var types=Object.keys(TYPES).map(function(k){return '<button class="mi" data-act="qtype" data-v="'+k+'"><span class="a">'+TYPES[k].n+'</span><span class="b">'+(!isPrem()&&(k==="c"||k==="d")?"🔒 Premium · ":"")+TYPES[k].d+' · '+idsOf(k).length+' soal tersedia</span><span class="go">→</span></button>'}).join("");
+  return '<header><p class="eyebrow">Soal</p><h2>Latihan sesuai bagian ujian</h2></header>'+
+   '<div class="menu"><button class="mi main" data-act="daily"><span class="a">Soal harian · 10 soal</span><span class="b">'+(done?'Selesai hari ini dengan skor '+done.s+'/'+done.t+'. Anda boleh mengulang.':'Soal berganti setiap hari: 3 kosakata, 3 percakapan, 2 menyimak, 2 membaca')+'</span><span class="go">→</span></button>'+
+   '<button class="mi" data-act="sim"><span class="a">'+(isPrem()?'':'🔒 ')+'Simulasi mini · 20 soal</span><span class="b">5 soal dari tiap bagian, campur acak</span><span class="go">→</span></button>'+
+   '<button class="mi" data-act="redo" '+(w?'':'disabled')+'><span class="a">Ulang soal yang salah</span><span class="b">'+(w?w+' soal menunggu diulang':'Belum ada soal yang salah')+'</span><span class="go">→</span></button></div>'+
+   '<h3>Per bagian</h3><div class="menu">'+types+'</div>'+
+   '<p class="muted small">Bagian menyimak memakai suara perangkat Anda. Jika suara bahasa Jepang tidak tersedia, gunakan tombol untuk menampilkan teks.</p>';
+}
+function vQuiz(){
+  var Q=S.Q;
+  if(Q.i>=Q.items.length)return vResult();
+  var it=Q.items[Q.i],q=it.q,pick=Q.picks[Q.i],ans=pick!==undefined;
+  var L="ABCD";
+  var ctx="";
+  if(q.ctx)ctx='<div class="doc" lang="ja">'+esc(q.ctx)+'</div>';
+  if(q.say){
+    var shown=ans||Q.reveal[Q.i];
+    ctx='<div class="row"><button class="btn primary" data-act="play">▶ Putar audio</button><button class="btn" data-act="playslow">▶ Pelan</button>'+(shown?'':'<button class="btn" data-act="reveal">Tampilkan teks</button>')+'</div>'+(shown?'<div class="doc" lang="ja">'+esc(q.say)+'</div>':'');
+  }
+  var opts=it.opts.map(function(o,i){
+    var cls="";
+    if(ans){if(o.ok)cls=" ok";else if(i===pick)cls=" bad";else cls=" dim"}
+    return '<button class="opt'+cls+'" data-act="pick" data-v="'+i+'" '+(ans?'disabled':'')+'><span class="l">'+L[i]+'</span><span class="tx">'+esc(o.t)+'</span></button>';
+  }).join("");
+  var correct=it.opts.filter(function(o){return o.ok})[0].t;
+  var fb="";
+  if(ans){var good=it.opts[pick].ok;fb='<div class="fb '+(good?'ok':'bad')+'"><b class="'+(good?'o':'b')+'">'+(good?'Benar.':'Kurang tepat.')+'</b> '+(good?'':'Jawaban: '+esc(correct)+'. ')+esc(q.e)+'</div>'}
+  var last=Q.i===Q.items.length-1;
+  return '<div class="qhead"><span class="tag">'+TYPES[q.t].n+'</span><span class="muted">'+Q.label+' · '+(Q.i+1)+'/'+Q.items.length+'</span></div>'+
+   '<div class="prog"><i style="width:'+(Q.i*100/Q.items.length)+'%"></i></div>'+
+   '<p class="qtext" style="white-space:pre-line">'+esc(q.q)+'</p>'+ctx+'<div class="opts">'+opts+'</div>'+fb+
+   '<div class="row"><button class="btn ghost" data-act="quit">Keluar</button>'+(ans?'<button class="btn primary" data-act="next" style="flex:1">'+(last?'Lihat hasil':'Soal berikutnya')+'</button>':'')+'</div>';
+}
+function finishQuiz(){
+  var Q=S.Q;if(Q.saved)return;Q.saved=true;
+  var c=0;
+  Q.items.forEach(function(it,i){
+    var ok=it.opts[Q.picks[i]]&&it.opts[Q.picks[i]].ok,t=it.q.t;
+    var s=P.stats[t]||(P.stats[t]={c:0,t:0});s.t++;if(ok){s.c++;c++}
+    var wi=P.wrong.indexOf(it.id);
+    if(ok&&wi>=0)P.wrong.splice(wi,1);
+    if(!ok&&wi<0)P.wrong.push(it.id);
+  });
+  Q.score=c;
+  if(Q.mode==="daily"&&!P.days[dkey()])P.days[dkey()]={s:c,t:Q.items.length};
+  save();
+}
+function vResult(){
+  finishQuiz();
+  var Q=S.Q,n=Q.items.length,pc=Math.round(Q.score*100/n);
+  var by={};Q.items.forEach(function(it,i){var t=it.q.t;by[t]=by[t]||{c:0,t:0};by[t].t++;if(it.opts[Q.picks[i]].ok)by[t].c++});
+  var rows=Object.keys(by).map(function(t){return '<tr><td>'+TYPES[t].n+'</td><td>'+by[t].c+' / '+by[t].t+'</td></tr>'}).join("");
+  var wrong=Q.items.filter(function(it,i){return!it.opts[Q.picks[i]].ok});
+  var rev=wrong.map(function(it){var c=it.opts.filter(function(o){return o.ok})[0].t;return '<div class="rev"><span class="tag">'+TYPES[it.q.t].n+'</span><p style="white-space:pre-line">'+esc(it.q.q)+'</p>'+(it.q.ctx?'<div class="doc" lang="ja">'+esc(it.q.ctx)+'</div>':'')+(it.q.say?'<div class="doc" lang="ja">'+esc(it.q.say)+'</div>':'')+'<p><b>Jawaban:</b> '+esc(c)+'</p><p class="muted small">'+esc(it.q.e)+'</p></div>'}).join("");
+  var msg=pc>=80?"Hasil yang kuat. Lanjutkan dengan simulasi mini.":pc>=50?"Cukup baik. Ulangi materi dari soal yang salah.":"Masih awal. Baca ulang materi, lalu coba lagi.";
+  return '<header><p class="eyebrow">'+esc(Q.label)+' selesai</p><div class="score">'+Q.score+'<span class="muted" style="font-size:1.6rem">/'+n+'</span></div><p class="muted">'+pc+'% benar. '+msg+'</p></header>'+
+   '<section class="panel"><table class="t"><tbody>'+rows+'</tbody></table></section>'+
+   '<div class="row"><button class="btn primary" data-act="menu" style="flex:1">Kembali ke menu soal</button>'+(wrong.length?'<button class="btn" data-act="redo" style="flex:1">Ulang yang salah</button>':'')+'</div>'+
+   (wrong.length?'<section class="panel"><h3>Tinjau soal yang salah</h3>'+rev+'</section>':'');
+}
+function vSoal(){return S.Q?vQuiz():vQuizMenu()}
+
+/* Ujian */
+function vExam(){
+  var plan=[
+   ["Minggu 1","Hafal hiragana dan katakana sampai bisa dibaca cepat. 20 kata baru per hari dari tab Kartu. Kerjakan soal harian."],
+   ["Minggu 2","Pelajari pola tata bahasa 1 sampai 8. Mulai dengan dialog di tab Percakapan. Latihan bagian Kaiwa · Hyōgen."],
+   ["Minggu 3","Pelajari bentuk て dan ない, kanji dasar, dan latihan menyimak setiap hari dengan audio asli dari sumber resmi."],
+   ["Minggu 4","Simulasi mini minimal 4 kali. Ulangi soal yang salah. Latih membaca pengumuman, jadwal, dan daftar harga."]
+  ];
+  var tips=[
+   ["Moji · Goi","Fokus pada bacaan kanji dasar, kata serapan katakana, dan hitungan (〜人, 〜個, 〜本). Hafal angka, hari, dan waktu."],
+   ["Kaiwa · Hyōgen","Hafal salam dan ungkapan situasi: di toko, kantor, stasiun, rumah sakit. Pilih jawaban yang sopan dan sesuai situasi."],
+   ["Chōkai","Dengarkan angka, jam, dan harga dengan teliti. Catat kata kunci. Dalam ujian asli Anda tidak bisa kembali ke soal sebelumnya."],
+   ["Dokkai","Mulai dari pertanyaan, lalu cari jawabannya di teks. Perhatikan jam, tanggal, angka, dan kata larangan seperti 〜ないでください."]
+  ];
+  return '<header><p class="eyebrow">Ujian</p><h2>Tentang JFT-Basic</h2></header>'+
+   '<section class="panel"><h3>Gambaran ujian</h3><div class="tw"><table class="t"><tbody>'+
+   '<tr><th>Bagian</th><td>Aksara dan kosakata, percakapan dan ekspresi, menyimak, membaca</td></tr>'+
+   '<tr><th>Jumlah soal</th><td>Sekitar 50 soal, tiap bagian sekitar 12 soal</td></tr>'+
+   '<tr><th>Waktu</th><td>60 menit untuk seluruh ujian, berbasis komputer di pusat ujian</td></tr>'+
+   '<tr><th>Skor</th><td>Skala 10 sampai 250, bukan jumlah benar biasa</td></tr>'+
+   '<tr><th>Tingkat</th><td>145–174: A1 · 175–199: A2.1 · 200–250: A2.2 (A2)</td></tr>'+
+   '</tbody></table></div><p class="muted small">Sumber: halaman resmi Japan Foundation. Jadwal, biaya, dan syarat lulus untuk program tertentu (misalnya SSW) bisa berubah, jadi cek situs resmi <a href="https://www.jpf.go.jp/jft-basic/e/about/" target="_blank" rel="noopener">jpf.go.jp/jft-basic</a> sebelum mendaftar.</p></section>'+
+   '<h3>Rencana 4 minggu</h3>'+plan.map(function(p){return '<details class="g"><summary>'+p[0]+'</summary><div class="gb"><p>'+p[1]+'</p></div></details>'}).join("")+
+   '<h3>Strategi per bagian</h3>'+tips.map(function(p){return '<details class="g"><summary>'+p[0]+'</summary><div class="gb"><p>'+p[1]+'</p></div></details>'}).join("")+
+   '<section class="panel"><h3>Data belajar di perangkat ini</h3><p class="muted small">Progres tersimpan di browser ini saja. Menghapus data situs akan menghapus progres.</p><button class="btn" data-act="wipe">Hapus semua progres</button></section>';
+}
+
+/* ---------- Premium (simulasi), AI Sensei, Akun ---------- */
+var PLANS={m:{n:"1 bulan",p:29000,d:30},y:{n:"1 tahun",p:199000,d:365}};
+function isPrem(){return P.plan==="premium"&&P.until>=dkey()}
+function rp(n){return "Rp"+n.toLocaleString("id-ID")}
+function lockBox(t){return '<section class="panel"><h3>🔒 '+t+'</h3><p class="muted">Fitur ini dibuka oleh paket Premium.</p><a class="btn primary" href="#akun" style="text-decoration:none">Lihat paket</a></section>'}
+function qr(){var r=rng(29000),s="";for(var y=0;y<21;y++)for(var x=0;x<21;x++)if(r()>.5)s+='<rect x="'+x+'" y="'+y+'" width="1" height="1"/>';return '<svg viewBox="0 0 21 21" width="168" height="168" style="background:#fff;padding:8px;border-radius:8px" fill="#000" role="img" aria-label="Kode QR contoh">'+s+'</svg>'}
+function aiLeft(){return P.ai.d===dkey()?Math.max(0,3-P.ai.n):3}
+
+function vSignup(){
+  var inp='width:100%;font:inherit;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink)';
+  return '<header class="hero"><p class="eyebrow">JFT-Basic · level A2</p><h1 lang="ja">日本語</h1><p class="lede">Buat akun untuk mulai belajar. Progres, paket, dan AI Sensei akan terhubung ke akun Anda.</p></header>'+
+   '<section class="panel"><h3>Buat akun</h3><label class="small muted" for="sn">Nama</label><input id="sn" autocomplete="name" style="'+inp+'"><label class="small muted" for="se">Email</label><input id="se" type="email" autocomplete="email" style="'+inp+'"><button class="btn primary block" data-act="signup">Buat akun dan mulai</button>'+
+   '<p class="muted small">Mode prototipe: tanpa kata sandi dan tanpa verifikasi email. Jika Anda membuka lewat akun claude.ai, pendaftaran juga dicatat untuk pemilik halaman.</p></section>';
+}
+function signup(){
+  var n=($("#sn")||{value:""}).value.trim(),e=($("#se")||{value:""}).value.trim();
+  if(!n){toast("Isi nama Anda");return}
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){toast("Email belum benar");return}
+  P.acct={n:n,e:e,t:dkey()};save();reg(P.acct);toast("Selamat datang, "+n);go("beranda");
+}
+async function reg(a){try{var db=window.claude?await claude.use("db"):null,us=window.claude?await claude.use("user"):null;if(!db||!us)return;var id=await us.id();if(!id)return;await db.doc("signups/"+id).set({n:a.n,e:a.e,t:a.t})}catch(e){}}
+async function ownerList(){var el=$("#own");if(!el)return;try{var us=window.claude?await claude.use("user"):null;if(!us||!(await us.isOwner()))return;var db=await claude.use("db");if(!db)return;var sn=await db.collection("signups").get();el.innerHTML='<h3>Pendaftar ('+sn.size+')</h3>'+(sn.size?sn.docs.map(function(d){var x=d.data();return '<p class="small">'+esc(x.n)+' · '+esc(x.e)+' · '+esc(x.t)+'</p>'}).join(""):'<p class="muted small">Belum ada pendaftar.</p>');el.hidden=false}catch(e){}}
+function vSensei(){
+  var qs=["Apa beda は dan が?","Jelaskan bentuk て","Kapan pakai に dan で?","Buatkan 3 soal partikel"];
+  var msgs=S.chat.map(function(m,i){var l=i===S.chat.length-1&&m.r==="assistant";return '<div class="bub '+m.r+'"'+(l?' id="lastbot"':'')+'>'+esc(m.c||"…")+'</div>'}).join("");
+  return '<header><p class="eyebrow">AI Sensei</p><h2>Tanya apa saja tentang bahasa Jepang</h2><p class="muted small">'+(isPrem()?'Premium: tanpa batas pertanyaan':'FREE: sisa '+aiLeft()+' pertanyaan hari ini')+'</p></header>'+
+   '<div class="chips">'+qs.map(function(q){return '<button class="chip" data-act="askq" data-v="'+esc(q)+'">'+esc(q)+'</button>'}).join("")+'</div>'+
+   '<div class="dlg">'+msgs+'</div>'+
+   '<textarea id="sq" rows="2" placeholder="Ketik pertanyaan…" class="ta">'+esc(S.draft)+'</textarea>'+
+   '<button class="btn primary block" data-act="ask" '+(S.busy?'disabled':'')+'>Kirim</button>'+
+   '<p class="muted small">Jawaban dibuat AI dan bisa keliru. Cocokkan dengan materi.</p>';
+}
+async function ask(text){
+  text=(text||"").trim();if(!text||S.busy)return;
+  if(!isPrem()){var d=dkey();if(P.ai.d!==d)P.ai={d:d,n:0};if(P.ai.n>=3){toast("Batas 3 pertanyaan per hari. Upgrade ke Premium.");return}P.ai.n++;save()}
+  var ctx=S.chat.slice(-6).map(function(m){return(m.r==="user"?"Murid: ":"Sensei: ")+m.c}).join("\n");
+  S.chat.push({r:"user",c:text},{r:"assistant",c:""});S.busy=true;S.draft="";rerender(true);
+  var sys="Kamu AI Sensei, guru bahasa Jepang untuk pelajar Indonesia yang menyiapkan JFT-Basic (level A2). Jawab dalam bahasa Indonesia, maksimal 120 kata. Tulis contoh Jepang dengan romaji dan arti. Jika cocok, akhiri dengan satu soal pilihan ganda kecil. Tolak topik di luar belajar bahasa Jepang.";
+  var bot=S.chat[S.chat.length-1];
+  try{
+    var sm=window.claude?await claude.use("sample"):null;
+    if(!sm)throw new Error("na");
+    await sm(sys+"\n\n"+ctx+"\nMurid: "+text+"\nSensei:",{cache:false,onText:function(o){bot.c=o.text;var el=$("#lastbot");if(el)el.textContent=o.text}});
+  }catch(e){bot.c=bot.c||"AI Sensei belum aktif di versi ini. Fitur ini butuh server tersendiri."}
+  S.busy=false;if(cur()==="sensei")rerender(true);
+}
+function vAkun(){
+  var pr=isPrem();
+  var h='<header><p class="eyebrow">Akun</p><h2>'+(pr?'💎 Premium aktif':'🆓 Paket FREE')+'</h2>'+(pr?'<p class="muted">Berlaku sampai '+esc(P.until)+'</p>':'')+'</header>'+
+   '<p class="muted">'+esc((window.__fbUser||P.acct).n)+' · '+esc((window.__fbUser||P.acct).e)+' <button class="btn ghost" data-act="logout">Halaman masuk</button></p><div class="note"><b>Mode prototipe.</b> Pembayaran hanya simulasi: tidak ada uang yang ditagih, dan status Premium tersimpan di browser ini saja.</div>';
+  if(S.pay){var pl=PLANS[S.pay];return h+'<section class="panel" style="align-items:center;text-align:center"><h3>Bayar dengan QRIS · '+pl.n+'</h3><p class="score" style="font-size:2rem">'+rp(pl.p)+'</p>'+qr()+'<p class="muted small">Kode contoh, bukan QRIS asli.</p><button class="btn primary block" data-act="paid">Simulasikan pembayaran berhasil</button><button class="btn ghost block" data-act="paycancel">Batal</button></section>'}
+  return h+
+   '<section class="panel"><h3>🆓 FREE</h3><p class="muted small">Kana, kosakata, kartu, percakapan, 4 pola tata bahasa pertama, soal harian, latihan Moji·Goi dan Kaiwa, AI Sensei 3 pertanyaan per hari.</p></section>'+
+   '<section class="panel"><h3>💎 Premium</h3><p class="muted small">Semua tata bahasa, kata kerja, kanji, latihan menyimak dan membaca, simulasi mini, AI Sensei tanpa batas.</p>'+
+   (pr?'<button class="btn" data-act="downgrade">Kembali ke FREE (uji coba)</button>':'<div class="row"><button class="btn primary" style="flex:1" data-act="buy" data-v="m">1 bulan<br>'+rp(29000)+'</button><button class="btn primary" style="flex:1" data-act="buy" data-v="y">1 tahun<br>'+rp(199000)+'</button></div>')+'</section>'+
+   '<section class="panel" id="own" hidden></section>'+'<div class="note"><b>Catatan level.</b> JFT-Basic menguji level A2, yang dicakup materi di aplikasi ini. N3 dan N2 adalah level JLPT dan belum tersedia.</div>';
+}
+
+/* ---------- Router ---------- */
+var VIEWS={beranda:vHome,materi:vMateri,kartu:vCards,soal:vSoal,ujian:vExam,sensei:vSensei,akun:vAkun};
+function cur(){var h=(location.hash||"").slice(1);return VIEWS[h]?h:"beranda"}
+function go(v){if(location.hash==="#"+v)render();else location.hash="#"+v}
+function render(){
+  if(!P.acct){$("#app").innerHTML=vSignup();$("#nav").innerHTML="";window.scrollTo(0,0);return}
+  var v=cur();
+  if(v==="kartu"&&!S.deckInit){S.deck=deckFor(S.ct);S.flip=false;S.deckInit=true}
+  $("#app").innerHTML=VIEWS[v]();if(v==="akun")ownerList();
+  $("#nav").innerHTML=TABS.map(function(t){return '<a href="#'+t[0]+'" '+(t[0]===v?'aria-current="page"':'')+'><span class="kj2" lang="ja">'+t[1]+'</span><span class="lb">'+t[2]+'</span></a>'}).join("");
+  window.scrollTo(0,0);
+}
+function rerender(keepScroll){var y=window.scrollY;var v=cur();$("#app").innerHTML=VIEWS[v]();if(v==="akun")ownerList();if(keepScroll)window.scrollTo(0,y)}
+window.addEventListener("hashchange",render);
+
+/* ---------- Aksi ---------- */
+$("#app").addEventListener("click",function(e){
+  var b=e.target.closest("[data-act]");if(!b||b.disabled)return;
+  var a=b.getAttribute("data-act"),v=b.getAttribute("data-v"),Q=S.Q;
+  switch(a){
+    case"signup":signup();break;
+    case"logout":location.href="index.html";break;
+    case"askq":ask(v);break;
+    case"ask":ask(($("#sq")||{}).value);break;
+    case"buy":S.pay=v;rerender(false);break;
+    case"paycancel":S.pay=null;rerender(false);break;
+    case"paid":var dd=new Date();dd.setDate(dd.getDate()+PLANS[S.pay].d);P.plan="premium";P.until=dkey(dd);S.pay=null;save();toast("Premium aktif (simulasi)");rerender(false);break;
+    case"downgrade":P.plan="free";P.until="";save();rerender(false);break;
+    case"say":speak(b.getAttribute("data-t"));break;
+    case"kana":S.kana=v;rerender(true);break;
+    case"vt":S.vt=v;rerender(true);break;
+    case"mat":S.mat=v;rerender(false);break;
+    case"ct":S.ct=v;S.deck=deckFor(v);S.flip=false;rerender(false);break;
+    case"flip":S.flip=!S.flip;rerender(true);break;
+    case"got":P.known[VOC[S.deck[0]].jp]=1;save();S.deck.shift();S.flip=false;rerender(true);break;
+    case"again":S.deck.push(S.deck.shift());S.flip=false;rerender(true);break;
+    case"creset":VOC.forEach(function(w){if(S.ct==="all"||w.th===S.ct)delete P.known[w.jp]});save();S.deck=deckFor(S.ct);S.flip=false;rerender(false);break;
+    case"daily":startQuiz("daily");break;
+    case"sim":startQuiz("sim");break;
+    case"redo":startQuiz("redo");break;
+    case"qtype":startQuiz("type",v);break;
+    case"pick":Q.picks[Q.i]=Number(v);rerender(true);break;
+    case"next":Q.i++;rerender(false);window.scrollTo(0,0);break;
+    case"play":speak(Q.items[Q.i].q.say.replace(/^[AB]:/gm,"").replace(/\n/g,"。"));break;
+    case"playslow":speak(Q.items[Q.i].q.say.replace(/^[AB]:/gm,"").replace(/\n/g,"。"),true);break;
+    case"test":speak("こんにちは。にほんごの おんせいの テストです。");break;
+    case"slow":S.slow=!S.slow;rerender(true);break;
+    case"reveal":Q.reveal[Q.i]=true;rerender(true);break;
+    case"quit":S.Q=null;rerender(false);break;
+    case"menu":S.Q=null;rerender(false);window.scrollTo(0,0);break;
+    case"wipe":if(b.getAttribute("data-sure")){P=blank();save();S.deckInit=false;toast("Progres dihapus");render()}else{b.setAttribute("data-sure","1");b.textContent="Ketuk lagi untuk menghapus";}break;
+  }
+});
+$("#app").addEventListener("input",function(e){if(e.target.id==="sq")S.draft=e.target.value});
+try{if("speechSynthesis" in window)speechSynthesis.getVoices()}catch(e){}
+render();
+})();
+</script>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {firebaseConfig} from "./firebase-config.js";
+onAuthStateChanged(getAuth(initializeApp(firebaseConfig)),function(u){if(!u)location.replace("index.html");else window.__fbUser={n:u.displayName||"Pengguna",e:u.email||""}});
+</script>
+</body></html>
