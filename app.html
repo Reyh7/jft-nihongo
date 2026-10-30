@@ -722,7 +722,7 @@ $("#app").addEventListener("click",function(e){
   var a=b.getAttribute("data-act"),v=b.getAttribute("data-v"),Q=S.Q;
   switch(a){
     case"signup":signup();break;
-    case"logout":location.href="index.html";break;
+    case"logout":location.href="index.html?keluar=1";break;
     case"askq":ask(v);break;
     case"ask":ask(($("#sq")||{}).value);break;
     case"buy":S.pay=v;rerender(false);break;
