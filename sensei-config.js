@@ -1,3 +1,3 @@
 // Isi dengan alamat Worker setelah deploy, contoh:
 // window.SENSEI_URL = "https://jft-sensei.NAMAKAMU.workers.dev";
-window.SENSEI_URL = "";
+window.SENSEI_URL = "https://sensi.rttyhhh934.workers.dev";
