@@ -3474,6 +3474,191 @@ function sgExtraClick(e){var b=e.target.closest("[data-act]");if(!b||b.disabled)
 $("#app").addEventListener("click",sgExtraClick);
 $("#app").addEventListener("change",function(e){if(e.target&&e.target.id==="sgBackupFile"){sgBackupImport(e.target.files&&e.target.files[0]);e.target.value=""}});
 
+/* ===== Modul SSW Food Service (tambahan) ===== */
+(function(){
+var C=[
+{id:"dapur",t:"Dapur & Peralatan",ic:"🔪",
+v:[["包丁","ほうちょう","houchou","pisau"],["まな板","まないた","manaita","talenan"],["鍋","なべ","nabe","panci"],["フライパン","フライパン","furaipan","wajan"],["冷蔵庫","れいぞうこ","reizouko","kulkas"],["皿","さら","sara","piring"]],
+d:[["A","田中さん、包丁とまな板を準備してください。","Tanaka-san, tolong siapkan pisau dan talenan."],["B","はい、わかりました。","Baik, saya mengerti."],["A","終わったら、手を洗ってください。","Kalau sudah selesai, tolong cuci tangan."],["B","はい、すぐやります。","Baik, segera saya lakukan."]],
+q:[["d1","listen","包丁を取ってください。","Apa yang diminta?",["Mengambil pisau","Mengambil talenan","Mengambil panci"],0,"包丁 = pisau, 取る = mengambil, 〜てください = tolong lakukan."],
+["d2","vocab","","「まな板」artinya?",["Talenan","Piring","Kulkas"],0,"まな板 (manaita) = talenan."],
+["d3","listen","鍋に水を入れてください。","Apa instruksinya?",["Masukkan air ke panci","Cuci panci","Matikan api"],0,"鍋 = panci, 水を入れる = memasukkan air."]]},
+{id:"higiene",t:"Kebersihan Makanan",ic:"🧼",
+v:[["手を洗う","てをあらう","te o arau","mencuci tangan"],["消毒","しょうどく","shoudoku","desinfeksi"],["消費期限","しょうひきげん","shouhi kigen","batas aman konsumsi"],["賞味期限","しょうみきげん","shoumi kigen","tanggal terbaik dikonsumsi"],["生もの","なまもの","namamono","makanan mentah"],["加熱する","かねつする","kanetsu suru","memanaskan / memasak matang"]],
+d:[["A","賞味期限を確認しましたか。","Sudah cek tanggal terbaik dikonsumsi?"],["B","はい、確認しました。","Ya, sudah saya cek."],["A","生ものは冷蔵庫に入れてください。","Makanan mentah tolong masukkan ke kulkas."],["B","わかりました。","Baik, saya mengerti."]],
+q:[["h1","listen","調理の前に、手を洗ってください。","Kapan harus mencuci tangan?",["Sebelum memasak","Setelah makan","Saat pulang"],0,"〜の前に = sebelum ~, 調理 = memasak."],
+["h2","vocab","","「消費期限」paling tepat artinya?",["Batas aman konsumsi","Harga bahan","Nama toko"],0,"消費期限 = batas aman dikonsumsi. 賞味期限 = tanggal terbaik (rasa), bukan batas keamanan."],
+["h3","vocab","","「加熱する」artinya?",["Memanaskan hingga matang","Mendinginkan","Mencuci"],0,"加熱 (かねつ) = pemanasan."]]},
+{id:"layanan",t:"Pelayanan Pelanggan",ic:"🍜",
+v:[["いらっしゃいませ","","irasshaimase","selamat datang"],["ご注文","ごちゅうもん","go chuumon","pesanan"],["少々お待ちください","しょうしょうおまちください","shoushou omachi kudasai","mohon tunggu sebentar"],["お待たせしました","おまたせしました","omatase shimashita","maaf menunggu lama"],["お会計","おかいけい","okaikei","pembayaran / tagihan"],["ありがとうございました","","arigatou gozaimashita","terima kasih (setelah selesai)"]],
+d:[["A","いらっしゃいませ。何名様ですか。","Selamat datang. Berapa orang?"],["B","二人です。","Dua orang."],["A","こちらへどうぞ。ご注文はお決まりですか。","Silakan lewat sini. Sudah menentukan pesanan?"],["B","ラーメンを二つお願いします。","Tolong dua ramen."],["A","かしこまりました。少々お待ちください。","Baik. Mohon tunggu sebentar."]],
+q:[["l1","listen","ご注文はお決まりですか。","Pelanggan ditanya apa?",["Sudah memutuskan pesanan?","Mau bayar?","Mau pulang?"],0,"ご注文 = pesanan, 決まる = diputuskan. Frasa standar saat menerima pesanan."],
+["l2","vocab","","「少々お待ちください」artinya?",["Mohon tunggu sebentar","Silakan duduk","Terima kasih"],0,"少々 = sebentar, お待ちください = mohon tunggu (sopan)."],
+["l3","listen","お待たせしました。こちらがカレーライスです。","Apa yang disajikan?",["Nasi kari","Sup miso","Ramen"],0,"カレーライス = nasi kari. お待たせしました = maaf menunggu lama."]]},
+{id:"aman",t:"Keselamatan & Darurat",ic:"🚨",
+v:[["火","ひ","hi","api"],["危ない","あぶない","abunai","berbahaya"],["気をつける","きをつける","ki o tsukeru","berhati-hati"],["けが","けが","kega","luka"],["火事","かじ","kaji","kebakaran"],["助けてください","たすけてください","tasukete kudasai","tolong saya"]],
+d:[["A","火を止めてください。","Tolong matikan api."],["B","はい、止めました。","Baik, sudah saya matikan."],["A","床がぬれています。気をつけてください。","Lantai basah. Hati-hati."],["B","はい、気をつけます。","Baik, saya akan hati-hati."]],
+q:[["s1","listen","火を止めてください。","Apa instruksinya?",["Matikan api","Nyalakan api","Kecilkan api"],0,"火 = api, 止める = menghentikan/mematikan."],
+["s2","listen","床がぬれています。気をつけてください。","Apa peringatannya?",["Lantai basah, hati-hati","Pintu rusak","Kulkas kosong"],0,"ぬれる = basah, 気をつける = berhati-hati."],
+["s3","vocab","","Kamu terluka di dapur. Apa yang kamu katakan ke atasan?",["けがをしました","ありがとうございました","いらっしゃいませ"],0,"けがをしました = saya terluka. Laporkan segera ke atasan."]]}
+];
+var SK={listen:"Listening",vocab:"Kosakata & ungkapan"};
+function E(t){return esc(String(t))}
+function W(){return S.sw||(S.sw={c:null,tab:"v",run:null})}
+function shuf(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function ST(){var p=P.ssw||(P.ssw={});p.sk=p.sk||{};p.c=p.c||{};p.miss=p.miss||{};return p}
+function play(t,slow){try{speak(t,slow)}catch(e){toast("Audio tidak tersedia di perangkat ini.")}}
+function stopA(){try{speechSynthesis.cancel()}catch(e){}try{audStop()}catch(e){}}
+function ab(t,x){return '<button class="swb" data-act="swplay" data-t="'+E(t)+'" data-s="'+(x?1:0)+'">'+(x?"🐢 Pelan":"▶ Putar")+'</button>'}
+function net(){return '<span class="swn '+(navigator.onLine?"on":"off")+'">'+(navigator.onLine?"Online":"Offline")+'</span>'}
+function acc(k){var s=ST().sk[k];return s&&s[1]?Math.round(s[0]/s[1]*100):null}
+function home(){
+  var p=ST(),rows=C.map(function(c){var r=p.c[c.id];return '<button class="swr" data-act="swc" data-v="'+c.id+'"><span>'+c.ic+'</span><b>'+E(c.t)+'</b><small>'+(r?"Terbaik "+r.best+"/"+c.q.length+" · "+r.n+"x":"Belum dicoba")+'</small></button>'}).join("");
+  var sk=Object.keys(SK).map(function(k){var a=acc(k);return '<div class="swk"><span>'+SK[k]+'</span><div class="swbar"><i style="width:'+(a||0)+'%"></i></div><b>'+(a===null?"–":a+"%")+'</b></div>'}).join("");
+  var ms=Object.keys(p.miss).sort(function(a,b){return p.miss[b]-p.miss[a]}).slice(0,3).map(function(id){var q=null;C.forEach(function(c){c.q.forEach(function(x){if(x[0]===id)q=x})});return q?'<li>'+E(q[3])+' <small>(salah '+p.miss[id]+'x)</small></li>':""}).join("");
+  var rec="Mulai dari <b>Dapur & Peralatan</b> untuk dasar kosakata.",tried=C.filter(function(c){return p.c[c.id]});
+  if(tried.length){var low=tried.slice().sort(function(a,b){return p.c[a.id].last-p.c[b.id].last})[0],un=C.filter(function(c){return!p.c[c.id]})[0];rec=un?"Lanjut ke kategori baru: <b>"+E(un.t)+"</b>.":"Ulangi <b>"+E(low.t)+"</b> (skor terakhir paling rendah: "+p.c[low.id].last+"/"+low.q.length+").";var wk=Object.keys(SK).filter(function(k){return acc(k)!==null}).sort(function(a,b){return acc(a)-acc(b)})[0];if(wk&&acc(wk)<70)rec+=" Perbanyak latihan <b>"+SK[wk]+"</b>."}
+  return '<header class="hero"><p class="eyebrow">Persiapan SSW '+net()+'</p><h2>Food Service 🍱</h2><p class="muted small">Dialog, kosakata, listening, dan kuis untuk kerja di restoran/dapur Jepang. Materi ini disusun sebagai latihan dan belum diverifikasi lembaga resmi.</p></header><section class="swc"><h3>Kategori</h3>'+rows+'</section><section class="swc"><h3>Analisis kemampuan</h3>'+sk+'<p class="small">'+rec+'</p>'+(ms?'<p class="small"><b>Sering salah:</b></p><ul class="small">'+ms+'</ul>':"")+'</section>'
+}
+function cat(c,w){
+  var tabs=[["v","Kosakata"],["d","Dialog"],["q","Latihan"]].map(function(t){return '<button class="swt'+(w.tab===t[0]?" on":"")+'" data-act="swt" data-v="'+t[0]+'">'+t[1]+'</button>'}).join("");
+  var b="";
+  if(w.tab==="v")b=c.v.map(function(x){return '<div class="swi"><div><b lang="ja">'+E(x[0])+'</b>'+(x[1]?' <span lang="ja" class="muted">'+E(x[1])+'</span>':"")+'<br><small>'+E(x[2])+' — '+E(x[3])+'</small></div>'+ab(x[1]||x[0])+'</div>'}).join("");
+  else if(w.tab==="d")b=c.d.map(function(l){return '<div class="swi"><div><b>'+l[0]+':</b> <span lang="ja">'+E(l[1])+'</span><br><small>'+E(l[2])+'</small></div>'+ab(l[1])+'</div>'}).join("")+'<p class="small muted">Suara memakai audio perangkat/server yang sudah dipakai aplikasi; kualitas bergantung pada suara Jepang di HP.</p>';
+  else b=quiz(c,w);
+  return '<div class="swh"><a class="swb" href="#ssw" data-act="swhome">‹ Kategori</a><b>'+c.ic+' '+E(c.t)+'</b>'+net()+'</div><div class="swts">'+tabs+'</div>'+b
+}
+function quiz(c,w){
+  var r=w.run;
+  if(!r)return '<section class="swc"><p>'+c.q.length+' soal (listening dan kosakata) dengan pembahasan.</p><button class="swb pri" data-act="swgo">Mulai latihan</button></section>';
+  if(r.done){var rv=r.qs.filter(function(q){return q.bad}).map(function(q){return '<li>'+E(q.q[3])+'<br><small>'+E(q.q[6])+'</small></li>'}).join("");return '<section class="swc"><h3>Skor: '+r.ok+'/'+r.qs.length+'</h3>'+(rv?'<p class="small"><b>Perlu diulang:</b></p><ul class="small">'+rv+'</ul>':'<p>Semua benar. Bagus!</p>')+'<button class="swb pri" data-act="swgo">Ulangi</button></section>'}
+  var q=r.qs[r.i],x=q.q,a=q.ans!==null;
+  var au=x[1]==="listen"?'<div class="swa">'+ab(x[2])+ab(x[2],1)+'<button class="swb" data-act="swstop">⏹ Henti</button></div>':"";
+  var os=q.o.map(function(o,i){var cl=a?(o.r?" good":(i===q.ans?" bad":"")):"";return '<button class="swo'+cl+'" data-act="swpick" data-v="'+i+'"'+(a?" disabled":"")+'>'+E(o.t)+'</button>'}).join("");
+  var fb=a?'<p class="small"><b>'+(q.o[q.ans].r?"Benar ✓":"Kurang tepat")+'</b><br>'+(x[1]==="listen"?'<span lang="ja">'+E(x[2])+'</span><br>':"")+E(x[6])+'</p><button class="swb pri" data-act="swnext">'+(r.i+1<r.qs.length?"Lanjut":"Lihat hasil")+'</button>':"";
+  return '<section class="swc"><small>Soal '+(r.i+1)+'/'+r.qs.length+' · '+SK[x[1]]+'</small><p><b>'+E(x[3])+'</b></p>'+au+os+fb+'</section>'
+}
+VIEWS.ssw=function(){var w=W(),c=C.filter(function(x){return x.id===w.c})[0];return '<div class="sw">'+(c?cat(c,w):home())+'</div>'};
+if(typeof PARENT!=="undefined")PARENT.ssw="belajar";
+if(typeof BACK!=="undefined")BACK.ssw="belajar";
+var ob=VIEWS.belajar;
+VIEWS.belajar=function(){return ob()+'<section class="swc" style="margin-top:12px"><a class="swr" href="#ssw"><span>🍱</span><b>SSW Food Service</b><small>Dapur, kebersihan, pelayanan, keselamatan</small></a></section>'};
+function finish(r,c){var p=ST(),rec=p.c[c.id]||{best:0,n:0,last:0};rec.n++;rec.last=r.ok;rec.best=Math.max(rec.best,r.ok);p.c[c.id]=rec;r.qs.forEach(function(q){var k=q.q[1],s=p.sk[k]||(p.sk[k]=[0,0]);s[1]++;if(!q.bad)s[0]++;else p.miss[q.q[0]]=(p.miss[q.q[0]]||0)+1});r.done=true;save()}
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-act^=sw]");if(!b||b.disabled||cur()!=="ssw")return;
+  var a=b.getAttribute("data-act"),v=b.getAttribute("data-v"),w=W(),c=C.filter(function(x){return x.id===w.c})[0];
+  if(a==="swplay"){play(b.getAttribute("data-t"),b.getAttribute("data-s")==="1");return}
+  if(a==="swstop"){stopA();return}
+  if(a==="swc"){w.c=v;w.tab="v";w.run=null}
+  else if(a==="swhome"){e.preventDefault();stopA();w.c=null;w.run=null}
+  else if(a==="swt"){stopA();w.tab=v}
+  else if(a==="swgo"){w.run={qs:shuf(c.q).map(function(q){return{q:q,o:shuf(q[4].map(function(t,i){return{t:t,r:i===q[5]}})),ans:null,bad:false}}),i:0,ok:0,done:false}}
+  else if(a==="swpick"){var q=w.run.qs[w.run.i];if(q.ans!==null)return;q.ans=Number(v);if(q.o[q.ans].r)w.run.ok++;else q.bad=true}
+  else if(a==="swnext"){stopA();if(w.run.i+1<w.run.qs.length)w.run.i++;else finish(w.run,c)}
+  else return;
+  rerender(a==="swpick")
+});
+window.addEventListener("online",function(){if(cur()==="ssw")rerender(true)});window.addEventListener("offline",function(){if(cur()==="ssw")rerender(true)});
+var st=document.createElement("style");st.textContent=".sw{padding-bottom:90px}.swc{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px 0}.swr{display:grid;grid-template-columns:36px 1fr;gap:2px 10px;align-items:center;width:100%;min-height:52px;text-align:left;padding:10px;margin:6px 0;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);font:inherit;text-decoration:none}.swr span{grid-row:span 2;font-size:1.5rem}.swr small{color:var(--muted,#667)}.swb{min-height:44px;padding:8px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;text-decoration:none;display:inline-flex;align-items:center}.swb.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}.swo{display:block;width:100%;min-height:48px;margin:6px 0;padding:10px;text-align:left;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit}.swo.good{border-color:#1a9e55;background:rgba(26,158,85,.15)}.swo.bad{border-color:#d33;background:rgba(220,50,50,.15)}.swi{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}.swh{display:flex;gap:10px;align-items:center;justify-content:space-between;margin:6px 0}.swts{display:flex;gap:6px}.swt{flex:1;min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit}.swt.on{background:var(--soft);border-color:var(--accent)}.swa{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.swk{display:grid;grid-template-columns:1fr 90px 40px;gap:8px;align-items:center;margin:6px 0}.swbar{height:8px;border-radius:6px;background:var(--line);overflow:hidden}.swbar i{display:block;height:100%;background:var(--accent)}.swn{font-size:.7rem;padding:2px 8px;border-radius:10px;border:1px solid var(--line)}.swn.off{color:#d33}";document.head.appendChild(st);
+})();
+
+/* ===== Isi level A1/B1/B2 + ujian evaluasi (tambahan) ===== */
+(function(){
+var X={
+a1:{n:"A1 · Dasar",t:"Memperkenalkan diri, memahami kalimat pendek, dan meminta sesuatu dengan sopan.",
+v:[["私","わたし","watashi","saya"],["学生","がくせい","gakusei","pelajar"],["先生","せんせい","sensei","guru"],["水","みず","mizu","air"],["食べる","たべる","taberu","makan"],["飲む","のむ","nomu","minum"],["本","ほん","hon","buku"],["今日","きょう","kyou","hari ini"]],
+g:[["AはBです","私は学生です。","Saya pelajar. (は dibaca “wa”, penanda topik)"],["〜をください","水をください。","Tolong beri saya air."],["〜ます","毎日、ごはんを食べます。","Saya makan nasi setiap hari."]],
+k:[["日","ひ / にち","hari, matahari"],["本","ほん","buku, asal"],["人","ひと / じん","orang"],["水","みず","air"],["大","おおきい / だい","besar"]],
+r:["私はリナです。インドネシアの学生です。毎日、日本語を勉強します。","Saya Rina. Saya pelajar Indonesia. Setiap hari saya belajar bahasa Jepang."],
+e:[["Kosakata","「みず」artinya?",["Air","Buku","Guru"],0,"みず = 水 = air."],["Tata bahasa","私（　）学生です。",["は","を","に"],0,"Partikel は (dibaca wa) menandai topik: 私は学生です = Saya pelajar."],["Tata bahasa","水（　）ください。",["を","は","で"],0,"〜をください = tolong beri saya ~. Partikel を menandai objek."],["Kanji","「本」dibaca?",["ほん","ひと","みず"],0,"本 = ほん (buku). 人 = ひと, 水 = みず."],["Kosakata","「食べる」artinya?",["Makan","Minum","Membaca"],0,"食べる = makan; 飲む = minum."],["Membaca","「私はリナです。インドネシアの学生です。」Siapa Rina?",["Pelajar Indonesia","Guru Jepang","Pekerja pabrik"],0,"インドネシアの学生 = pelajar (dari) Indonesia."]]},
+b1:{n:"B1 · Menengah",t:"Menyatakan pengalaman, kewajiban, dan alasan dalam percakapan sehari-hari dan kerja.",
+v:[["経験","けいけん","keiken","pengalaman"],["予定","よてい","yotei","rencana"],["準備","じゅんび","junbi","persiapan"],["連絡","れんらく","renraku","menghubungi, kabar"],["約束","やくそく","yakusoku","janji"],["忙しい","いそがしい","isogashii","sibuk"],["遅れる","おくれる","okureru","terlambat"],["説明","せつめい","setsumei","penjelasan"]],
+g:[["〜たことがあります","日本料理を食べたことがあります。","Saya pernah makan masakan Jepang."],["〜なければなりません","明日は早く起きなければなりません。","Besok saya harus bangun pagi."],["〜ので","忙しいので、行けません。","Karena sibuk, saya tidak bisa pergi."]],
+k:[["予","よ","di muka (予定 = rencana)"],["約","やく","janji (約束)"],["連","れん","menghubungkan (連絡)"],["説","せつ","menjelaskan (説明)"],["忙","いそが(しい)","sibuk"]],
+r:["明日は大切な会議があるので、今日は早く寝なければなりません。友だちと約束がありましたが、連絡して断りました。","Besok ada rapat penting, jadi hari ini saya harus tidur cepat. Saya punya janji dengan teman, tetapi saya menghubunginya dan menolak."],
+e:[["Tata bahasa","日本へ行った（　）があります。",["こと","もの","ところ"],0,"〜たことがある = pernah melakukan ~."],["Kosakata","「遅れる」artinya?",["Terlambat","Cepat","Lupa"],0,"遅れる (おくれる) = terlambat."],["Tata bahasa","雨が降っている（　）、出かけません。",["ので","のに","ながら"],0,"〜ので = karena ~ (alasan). のに = padahal, tidak cocok di sini."],["Tata bahasa","毎日、勉強し（　）ばなりません。",["なけれ","ない","なくて"],0,"〜なければなりません = harus ~."],["Kanji","「連絡」dibaca?",["れんらく","れいらく","れんろく"],0,"連絡 (れんらく) = menghubungi / kabar."],["Membaca","「明日は大切な会議があるので、今日は早く寝なければなりません。」Mengapa harus tidur cepat?",["Besok ada rapat penting","Hari ini sakit","Besok libur"],0,"ので menunjukkan alasan: ada rapat penting besok."]]},
+b2:{n:"B2 · Lebih kompleks",t:"Menyatakan dugaan, penyangkalan halus, dan keterpaksaan; memahami teks kerja singkat.",
+v:[["改善","かいぜん","kaizen","perbaikan"],["影響","えいきょう","eikyou","pengaruh"],["状況","じょうきょう","joukyou","situasi"],["対応","たいおう","taiou","penanganan"],["可能性","かのうせい","kanousei","kemungkinan"],["責任","せきにん","sekinin","tanggung jawab"],["判断","はんだん","handan","penilaian"],["提案","ていあん","teian","usulan"]],
+g:[["〜に違いない","彼は合格するに違いない。","Dia pasti lulus."],["〜わけではない","嫌いなわけではない。","Bukan berarti saya benci."],["〜ざるを得ない","歩かざるを得なかった。","Terpaksa harus berjalan kaki."]],
+k:[["改","かい","memperbaiki (改善)"],["影","えい","bayangan (影響)"],["響","きょう","bergema (影響)"],["責","せき","tanggung jawab (責任)"],["判","はん","menilai (判断)"]],
+r:["ミスをすることもあるが、すぐに報告して改善すれば、信頼される。","Kadang kita membuat kesalahan, tetapi jika segera melapor dan memperbaiki, kita akan dipercaya."],
+e:[["Tata bahasa","「彼は合格するに違いない」paling dekat artinya?",["Dia pasti lulus","Dia mungkin tidak lulus","Dia harus lulus"],0,"〜に違いない = pasti / tidak diragukan (keyakinan kuat)."],["Tata bahasa","「嫌いなわけではない」artinya?",["Bukan berarti benci","Sangat benci","Tidak tahu"],0,"〜わけではない = bukan berarti ~ (menyangkal kesimpulan)."],["Tata bahasa","電車が止まったので、歩か（　）を得なかった。",["ざる","ない","ず"],0,"〜ざるを得ない = terpaksa ~: 歩かざるを得なかった."],["Kanji","「影響」dibaca?",["えいきょう","えいごう","ええきょう"],0,"影響 (えいきょう) = pengaruh."],["Kosakata","「責任」artinya?",["Tanggung jawab","Usulan","Perbaikan"],0,"責任 (せきにん) = tanggung jawab."],["Membaca","「ミスをすることもあるが、すぐに報告して改善すれば、信頼される。」Bagaimana agar dipercaya?",["Segera melapor dan memperbaiki","Menyembunyikan kesalahan","Tidak pernah bekerja"],0,"すぐに報告して改善すれば = jika segera melapor dan memperbaiki, akan dipercaya."]]}};
+var TB=[["t","Target"],["v","Kosakata"],["g","Tata bahasa"],["k","Kanji"],["r","Membaca"],["e","Ujian"]];
+function E(t){return esc(String(t))}
+function st(id){var o=P.lvx||(P.lvx={});return o[id]||(o[id]={best:0,n:0,tabs:{}})}
+function W(){return S.lvv||(S.lvv={id:"a1",tab:"t",run:null})}
+function sh(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function pass(id){return st(id).best/X[id].e.length>=.7}
+window.SGLX={has:function(id){return!!X[id]},
+req:function(id){var s=st(id);return[pass(id),"Lulus ujian evaluasi ≥ 70% (terbaik: "+(s.n?s.best+"/"+X[id].e.length:"belum ada")+")"]},
+btn:function(id){return' <a class="swb pri" href="#level" data-act="lvo" data-v="'+id+'">Buka isi level</a>'},
+card:function(l){var id=l.id,s=st(id),ok=pass(id),n=Object.keys(s.tabs).length;return'<section class="swc"><b>'+E(X[id].n)+'</b> <span class="swn '+(ok?"on":"")+'">'+(ok?"Lulus level":"Berjalan")+'</span><p class="small">'+E(X[id].t)+'</p><ul class="small" style="list-style:none;padding:0"><li>'+(n>=5?"✅":"⬜")+' Buka semua bagian isi level ('+Math.min(n,5)+'/5)</li><li>'+(ok?"✅":"⬜")+' '+E(SGLX.req(id)[1])+'</li></ul><p class="small muted">Isi level ini masih ringkas (8 kosakata, 3 pola, 5 kanji, 1 bacaan, 6 soal) dan belum divalidasi penutur asli.</p>'+SGLX.btn(id)+'</section>'}};
+function body(id,w){var x=X[id],t=w.tab;
+ if(t==="t")return'<section class="swc"><p>'+E(x.t)+'</p><p class="small muted">Ujian evaluasi: 6 soal, target lulus ≥ 70% (target internal aplikasi, bukan standar resmi). Bagian Listening belum tersedia di level ini.</p></section>';
+ if(t==="v")return x.v.map(function(v){return'<div class="swi"><div><b lang="ja">'+E(v[0])+'</b> <span lang="ja" class="muted">'+E(v[1])+'</span><br><small>'+E(v[2])+' — '+E(v[3])+'</small></div><button class="swb" data-act="lvp" data-t="'+E(v[1])+'">▶</button></div>'}).join("");
+ if(t==="g")return x.g.map(function(g){return'<section class="swc"><b lang="ja">'+E(g[0])+'</b><p lang="ja">'+E(g[1])+'</p><p class="small">'+E(g[2])+'</p></section>'}).join("");
+ if(t==="k")return x.k.map(function(k){return'<div class="swi"><div><b lang="ja" style="font-size:1.6rem">'+E(k[0])+'</b> <span lang="ja">'+E(k[1])+'</span><br><small>'+E(k[2])+'</small></div></div>'}).join("");
+ if(t==="r")return'<section class="swc"><p lang="ja" style="font-size:1.1rem;line-height:1.8">'+E(x.r[0])+'</p><details><summary>Terjemahan</summary><p class="small">'+E(x.r[1])+'</p></details><p class="small muted">Soal bacaan ada di tab Ujian.</p></section>';
+ var r=w.run;
+ if(!r)return'<section class="swc"><p>'+x.e.length+' soal: kosakata, tata bahasa, kanji, dan membaca.</p><button class="swb pri" data-act="lvg">Mulai ujian</button></section>';
+ if(r.done)return'<section class="swc"><h3>Skor: '+r.ok+'/'+r.qs.length+' · '+(r.ok/r.qs.length>=.7?"Lulus":"Belum lulus")+'</h3>'+r.qs.filter(function(q){return q.bad}).map(function(q){return'<p class="small"><b>'+E(q.q[1])+'</b><br>'+E(q.q[4])+'</p>'}).join("")+'<button class="swb pri" data-act="lvg">Ulangi</button></section>';
+ var q=r.qs[r.i],a=q.ans!==null;
+ return'<section class="swc"><small>Soal '+(r.i+1)+'/'+r.qs.length+' · '+q.q[0]+'</small><p><b lang="ja">'+E(q.q[1])+'</b></p>'+q.o.map(function(o,i){return'<button class="swo'+(a?(o.r?" good":(i===q.ans?" bad":"")):"")+'" data-act="lvk" data-v="'+i+'"'+(a?" disabled":"")+'>'+E(o.t)+'</button>'}).join("")+(a?'<p class="small"><b>'+(q.o[q.ans].r?"Benar ✓":"Kurang tepat")+'</b><br>'+E(q.q[4])+'</p><button class="swb pri" data-act="lvn">'+(r.i+1<r.qs.length?"Lanjut":"Lihat hasil")+'</button>':"")+'</section>'}
+VIEWS.level=function(){var w=W();if(!X[w.id])w.id="a1";var s=st(w.id);s.tabs[w.tab]=1;
+ return'<div class="sw"><div class="swh"><a class="swb" href="#kurikulum">‹ Kurikulum</a><b>'+E(X[w.id].n)+'</b></div><div class="swts" style="flex-wrap:wrap">'+TB.map(function(t){return'<button class="swt'+(w.tab===t[0]?" on":"")+'" data-act="lvt" data-v="'+t[0]+'" style="min-width:30%">'+t[1]+'</button>'}).join("")+'</div>'+body(w.id,w)+'</div>'};
+if(typeof PARENT!=="undefined")PARENT.level="belajar";
+if(typeof BACK!=="undefined")BACK.level="kurikulum";
+document.addEventListener("click",function(e){var b=e.target.closest("[data-act^=lv]");if(!b||b.disabled)return;var a=b.getAttribute("data-act"),v=b.getAttribute("data-v"),w=W(),x=X[w.id];
+ if(a==="lvo"){S.lvv={id:v,tab:"t",run:null};return}
+ if(cur()!=="level")return;
+ if(a==="lvp"){try{speak(b.getAttribute("data-t"))}catch(er){toast("Audio tidak tersedia.")}return}
+ if(a==="lvt"){try{speechSynthesis.cancel()}catch(er){}w.tab=v}
+ else if(a==="lvg")w.run={qs:sh(x.e).map(function(q){return{q:q,o:sh(q[2].map(function(t,i){return{t:t,r:i===q[3]}})),ans:null,bad:false}}),i:0,ok:0,done:false};
+ else if(a==="lvk"){var q=w.run.qs[w.run.i];if(q.ans!==null)return;q.ans=Number(v);if(q.o[q.ans].r)w.run.ok++;else q.bad=true}
+ else if(a==="lvn"){if(w.run.i+1<w.run.qs.length)w.run.i++;else{var s=st(w.id);s.n++;s.best=Math.max(s.best,w.run.ok);w.run.done=true;save()}}
+ else return;rerender(a==="lvk")});
+})();
+
+/* ===== Kurikulum A1–N2 & dashboard JFT-Basic (tambahan) ===== */
+(function(){
+var L=[
+{id:"a1",n:"A1 · Dasar",g:"Membaca hiragana dan katakana sebagai fondasi.",src:["a2-hira","a2-kata"]},
+{id:"a2",n:"A2 · Sehari-hari & JFT-Basic",lv:"a2",exam:1},
+{id:"b1",n:"B1 · Menengah",g:"Komunikasi menengah.",none:1},
+{id:"b2",n:"B2 · Lebih kompleks",g:"Komunikasi lebih kompleks.",none:1},
+{id:"n3",n:"JLPT N3",lv:"n3"},
+{id:"n2",n:"JLPT N2",lv:"n2"}];
+function E(t){return esc(String(t))}
+function K(){return S.kur||(S.kur={tab:"k"})}
+function logs(){return (P.log||[]).filter(function(e){return e.k==="quiz"&&(e.m==="full"||e.m==="sim")})}
+function best(){var b=null;logs().forEach(function(e){var r=e.n?e.s/e.n:0;if(b===null||r>b)b=r});return b}
+function items(l){var l2=null;if(l.src)return l.src.map(function(i){return MI[i]}).filter(Boolean);if(l.lv)return ITEMS.filter(function(m){return m.l===l.lv&&m.a});return []}
+function lvl(l){
+  var it=items(l),dn=it.filter(function(m){return frac(m)>=1}).length,g=l.g||(l.lv&&LVL.filter(function(x){return x.id===l.lv})[0]||{}).g||"";
+  var req=[];
+  if(!it.length&&window.SGLX&&SGLX.has(l.id))return SGLX.card(l);if(!it.length)return'<section class="swc"><b>'+E(l.n)+'</b> <span class="swn off">Belum tersedia</span><p class="small">'+E(g)+'</p><p class="small muted">Materinya belum dibuat di aplikasi ini, jadi belum ada syarat penyelesaian yang bisa diukur.</p></section>';
+  var okM=dn===it.length;req.push([okM,"Selesaikan semua materi tersedia ("+dn+"/"+it.length+")"]);if(window.SGLX&&SGLX.has(l.id))req.push(SGLX.req(l.id));
+  if(l.exam){var b=best();req.push([b!==null&&b>=.7,"Skor simulasi latihan ≥ 70% (terbaik: "+(b===null?"belum ada":Math.round(b*100)+"%")+")"])}
+  var all=req.every(function(r){return r[0]}),pc=Math.round(dn/it.length*100);
+  return '<section class="swc"><b>'+E(l.n)+'</b> <span class="swn '+(all?"on":"")+'">'+(all?"Lulus level":"Berjalan")+'</span><p class="small">'+E(g)+'</p><div class="swk"><span>Materi</span><div class="swbar"><i style="width:'+pc+'%"></i></div><b>'+pc+'%</b></div><ul class="small" style="list-style:none;padding:0">'+req.map(function(r){return'<li>'+(r[0]?"✅":"⬜")+" "+E(r[1])+'</li>'}).join("")+'</ul><a class="swb" href="#materi">Buka materi</a>'+(window.SGLX&&SGLX.has(l.id)?SGLX.btn(l.id):"")+'</section>'
+}
+function jft(){
+  var h=logs().slice(-5).reverse().map(function(e){return'<li>'+E(e.d)+' · '+e.s+'/'+e.n+' · perkiraan skor latihan '+Math.round(10+240*e.s/e.n)+'</li>'}).join("");
+  var w=Object.keys(P.stats||{}).map(function(k){var s=P.stats[k];return{k:k,a:s.t?s.c/s.t:0,t:s.t}}).filter(function(x){return x.t>=3}).sort(function(a,b){return a.a-b.a});
+  var wr=w.slice(0,5).map(function(x){return'<div class="swk"><span>'+E(x.k)+'</span><div class="swbar"><i style="width:'+Math.round(x.a*100)+'%"></i></div><b>'+Math.round(x.a*100)+'%</b></div>'}).join("");
+  var rec=w.length?'Latih ulang <b>'+E(w[0].k)+'</b> (akurasi '+Math.round(w[0].a*100)+'% dari '+w[0].t+' jawaban).':'Kerjakan beberapa kuis dulu agar kelemahan bisa dianalisis (minimal 3 jawaban per jenis).';
+  var wl=(P.wrong||[]).length;
+  return '<section class="swc"><h3>JFT-Basic (jalur A2)</h3><p class="small">Jalur ini terpisah dari JLPT. Simulasi di aplikasi adalah <b>latihan</b>: format dan skor perkiraannya <b>bukan ujian resmi</b> JFT-Basic dan tidak diverifikasi pihak penyelenggara.</p><a class="swb pri" href="#soal">Kuis & simulasi</a></section><section class="swc"><h3>Riwayat simulasi</h3>'+(h?'<ul class="small">'+h+'</ul>':'<p class="small muted">Belum ada simulasi.</p>')+'</section><section class="swc"><h3>Analisis kelemahan</h3>'+(wr||'')+'<p class="small">'+rec+'</p>'+(wl?'<p class="small">'+wl+' soal masih salah dan menunggu diulang.</p>':'')+'</section>'
+}
+VIEWS.kurikulum=function(){var k=K(),tb=[["k","Kurikulum"],["j","JFT-Basic"]].map(function(t){return'<button class="swt'+(k.tab===t[0]?" on":"")+'" data-act="kt" data-v="'+t[0]+'">'+t[1]+'</button>'}).join("");
+  return '<div class="sw"><header class="hero"><p class="eyebrow">Jalur belajar</p><h2>A1 → N2</h2><p class="muted small">Syarat lulus dihitung dari progres dan skor latihanmu sendiri, bukan standar resmi.</p></header><div class="swts">'+tb+'</div>'+(k.tab==="j"?jft():L.map(lvl).join(""))+'</div>'};
+if(typeof PARENT!=="undefined")PARENT.kurikulum="belajar";
+if(typeof BACK!=="undefined")BACK.kurikulum="belajar";
+var ob2=VIEWS.belajar;
+VIEWS.belajar=function(){return ob2()+'<section class="swc" style="margin-top:12px"><a class="swr" href="#kurikulum"><span>🗺️</span><b>Kurikulum A1–N2 & JFT-Basic</b><small>Syarat level, riwayat simulasi, analisis kelemahan</small></a></section>'};
+document.addEventListener("click",function(e){var b=e.target.closest('[data-act="kt"]');if(!b||cur()!=="kurikulum")return;K().tab=b.getAttribute("data-v");rerender(false)});
+})();
+
 /* Existing quiz completion is based on real answered questions; no synthetic score is added. */
 render();
 sgRestoreBackup();
