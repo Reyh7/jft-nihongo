@@ -505,8 +505,8 @@ body{padding-block:14px calc(92px + env(safe-area-inset-bottom,0px))}
 .exam-lockbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px 10px 10px;border-radius:18px;background:var(--panel);border:1px solid var(--line);box-shadow:none}.eb-main{display:flex;align-items:center;gap:12px;min-width:0}.eb-count{flex:none;min-width:56px;height:46px;padding:0 10px;border-radius:14px;display:grid;place-items:center;grid-auto-flow:column;gap:1px;background:color-mix(in srgb,var(--accent) 22%,transparent);font-size:.8rem}.eb-count b{font-size:1.2rem}.exam-lockbar .meta{min-width:0;display:flex;flex-direction:column;gap:2px}.exam-lockbar .meta b{font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.exam-lockbar .meta span{font-size:.75rem;opacity:.7}.exam-lockbar .exit{flex:none;padding:8px 12px;font-size:.8rem;border-radius:12px;min-height:0}.exam-progress{height:6px;border-radius:99px;margin:10px 2px 8px;overflow:hidden;background:color-mix(in srgb,var(--accent) 18%,transparent)}.exam-progress i{display:block;height:100%;border-radius:99px;background:var(--accent)}.exam-mode-note{text-align:center;font-size:.72rem;opacity:.6;margin:4px 0 14px}
 
 /* ===== ShigotoGo: navy #071D49 + merah #E60023 ===== */
-:root,:root:not([data-theme="dark"]){--paper:#F5F7FB;--panel:#FFFFFF;--ink:#17243B;--ink2:#5A6A85;--line:#E2E8F0;--accent:#071D49;--accent-ink:#FFFFFF;--soft:#EAEFF8;--red:#E60023;--grad:linear-gradient(135deg,#E60023,#B3001B);--hero:linear-gradient(135deg,#071D49,#10306F 60%,#1B4390);--shadow:0 8px 24px rgba(7,29,73,.08);color-scheme:light}
-:root[data-theme="dark"]{--paper:#101827;--panel:#1D293B;--ink:#F5F7FB;--ink2:#A9B6CC;--line:#344256;--accent:#8EABFF;--accent-ink:#101827;--soft:#26354D;--red:#FF5268;--hero:linear-gradient(135deg,#0F2A63,#1B3F8A);--shadow:0 8px 24px rgba(0,0,0,.4);color-scheme:dark}
+:root,:root:not([data-theme="dark"]){--paper:#F5F7FB;--panel:#FFFFFF;--ink:#17243B;--ink2:#5A6A85;--line:#E2E8F0;--accent:#071D49;--accent-ink:#FFFFFF;--soft:#EAEFF8;--red:#E60023;--grad:linear-gradient(135deg,#E60023,#B3001B);--hero:linear-gradient(135deg,#071D49,#10306F 60%,#1B4390);--shadow:0 8px 24px rgba(7,29,73,.08);--ok:#1D7A4B;--ok-bg:#E2F4EA;--bad:#B0352E;--bad-bg:#FBE7E5;--gold:#9A6B0C;color-scheme:light}
+:root[data-theme="dark"]{--paper:#101827;--panel:#1D293B;--ink:#F5F7FB;--ink2:#A9B6CC;--line:#344256;--accent:#8EABFF;--accent-ink:#101827;--soft:#26354D;--red:#FF5268;--hero:linear-gradient(135deg,#0F2A63,#1B3F8A);--shadow:0 8px 24px rgba(0,0,0,.4);--ok:#62D096;--ok-bg:#133B2B;--bad:#FF8F86;--bad-bg:#4A1E22;--gold:#E3B24C;color-scheme:dark}
 body{background:var(--paper)}
 .hero{background:var(--hero);box-shadow:0 14px 34px rgba(7,29,73,.35)}
 .hero::after{width:120px;height:120px;background:#E60023;opacity:.4}
@@ -1296,27 +1296,34 @@ var NETV={a:null,tk:0,bad:0};
 function netOn(){try{if(localStorage.getItem("jft_netvoice")==="0")return false}catch(e){}return NETV.bad<3&&navigator.onLine!==false&&!!window.Audio}
 function netChunks(t){
   var out=[],cur="";
-  String(t||"").replace(/\s+/g," ").trim().split(/(?<=[。！？!?.、,])/).forEach(function(p){
-    while(p.length>170){if(cur){out.push(cur);cur=""}out.push(p.slice(0,170));p=p.slice(170)}
-    if((cur+p).length>170){out.push(cur);cur=p}else cur+=p;
+  String(t||"").replace(/\s+/g," ").trim().split(/(?<=[。！？!?.])\s*/).forEach(function(p){
+    while(p.length>170){var k=Math.max(p.lastIndexOf("、",170),p.lastIndexOf(",",170),p.lastIndexOf(" ",170));if(k<60)k=170;if(cur){out.push(cur);cur=""}out.push(p.slice(0,k));p=p.slice(k)}
+    if((cur+p).length>170){out.push(cur);cur=p}else cur+=(cur?" ":"")+p;
   });
   if(cur.trim())out.push(cur);
   return out.filter(function(x){return x.replace(/[\s。、！？!?.,]/g,"")});
 }
-function netSpeak(text,lang,slow,done,fail){
-  var ch=netChunks(text),tk=++NETV.tk,n=0;
-  if(!ch.length||!netOn()){fail();return}
+function netUrl(t,lang,slow){return "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl="+lang+"&ttsspeed="+(slow?"0.3":"1")+"&q="+encodeURIComponent(t)}
+/* Antrean suara online: potongan berikutnya diunduh saat potongan sekarang diputar, supaya tidak ada jeda panjang */
+function netQueue(items,slow,done,fail){
+  var list=[];
+  (items||[]).forEach(function(it){netChunks(it.t).forEach(function(c){list.push({t:c,l:it.l})})});
+  var tk=++NETV.tk;
+  if(!list.length||!netOn()){fail();return}
+  var au=[],mk=function(i){if(i<list.length&&!au[i]){var a=new Audio(netUrl(list[i].t,list[i].l,slow));a.preload="auto";au[i]=a}return au[i]};
+  var n=0;
   var next=function(){
     if(tk!==NETV.tk)return;
-    if(n>=ch.length){done();return}
-    var a=new Audio("https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl="+lang+"&ttsspeed="+(slow?"0.3":"1")+"&q="+encodeURIComponent(ch[n]));
-    NETV.a=a;var first=n===0;n++;
+    if(n>=list.length){done();return}
+    var i=n++,a=mk(i),first=i===0;
+    NETV.a=a;mk(i+1);
     a.onended=function(){if(tk===NETV.tk){NETV.bad=0;next()}};
     var bad=function(){if(tk!==NETV.tk)return;NETV.a=null;NETV.bad++;if(first)fail();else done()};
     a.onerror=bad;var p;try{p=a.play()}catch(e){bad();return}if(p&&p.catch)p.catch(bad);
   };
   next();
 }
+function netSpeak(text,lang,slow,done,fail){netQueue([{t:text,l:lang}],slow,done,fail)}
 function speak(text,slow){stopRec();playRec(text,function(){},function(){netSpeak(text,"ja",slow||S.slow,function(){},function(){speakTTS(text,slow)})})}
 function audioKeys(){
   var o={},add=function(t){var k=audKey(t);if(k)o[k]=1};
@@ -2187,12 +2194,11 @@ function vsPanel(){
    '<p class="kick">Dikte (bicara ke Sensei)</p><div class="vs-seg">'+vsOpt("Dict","id-ID","Indonesia",q.dl)+vsOpt("Dict","ja-JP","日本語",q.dl)+'</div>'+
    '<p class="muted small">Pengaturan ini berlaku untuk suara dan mikrofon AI Sensei.</p></div>';
 }
-function sayAI(t){stopRec();var qs0=VS(),segs=[];String(t).replace(/[*#`_>]/g,"").split(/([\u3040-\u30ff\u3400-\u9fff][\u3040-\u30ff\u3400-\u9fff、。！？ー\s]*)/).forEach(function(p){if(p.trim())segs.push({t:p,jp:/[\u3040-\u30ff\u3400-\u9fff]/.test(p)})});
+function sayAI(t){stopRec();var qs0=VS(),segs=[];String(t).replace(/[*#`_>]/g,"").replace(/([\u3040-\u30ff\u3400-\u9fff。！？、ー]\s*)\(\s*[A-Za-zāīūēōĀĪŪĒŌ' ,.\-~]+\s*\)/g,"$1").split(/([\u3040-\u30ff\u3400-\u9fff][\u3040-\u30ff\u3400-\u9fff、。！？ー\s]*)/).forEach(function(p){if(p.trim())segs.push({t:p,jp:/[\u3040-\u30ff\u3400-\u9fff]/.test(p)})});
   if(!segs.length||!netOn()){sayAIsys(t);return}
   try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
-  var k=0,end=function(){if(S.autoTalk&&S.sopen&&!S.busy&&!S.rec)setTimeout(micStart,350)};
-  var step=function(){if(k>=segs.length){end();return}var g=segs[k++];netSpeak(g.t,g.jp?"ja":"id",qs0.rt==="s",step,function(){if(k===1)sayAIsys(t);else end()})};
-  step();
+  var end=function(){if(S.autoTalk&&S.sopen&&!S.busy&&!S.rec)setTimeout(micStart,350)};
+  netQueue(segs.map(function(g){return{t:g.t,l:g.jp?"ja":"id"}}),qs0.rt==="s",end,function(){sayAIsys(t)});
 }
 function sayAIsys(t){try{if(!("speechSynthesis" in window))return;speechSynthesis.cancel();var vs=speechSynthesis.getVoices(),last=null;
   String(t).replace(/[*#`_>]/g,"").split(/([\u3040-\u30ff\u3400-\u9fff][\u3040-\u30ff\u3400-\u9fff、。！？ー\s]*)/).forEach(function(p){
@@ -2229,9 +2235,9 @@ function refundAI(){if(!isPrem()&&P.ai&&P.ai.n>0){P.ai.n--;save()}}
 async function ask(text){
   text=(text||"").trim();if(!text||S.busy)return;
   if(!isPrem()){var d=dkey();if(P.ai.d!==d)P.ai={d:d,n:0};if(P.ai.n>=5){toast("Batas 5 pertanyaan per hari. Premium: Sensei tanpa batas.");return}P.ai.n++;save()}
-  var ctx=S.chat.slice(-6).map(function(m){return(m.r==="user"?"Murid: ":"Sensei: ")+m.c}).join("\n");
+  var ctx=S.chat.slice(-10).map(function(m){return(m.r==="user"?"Murid: ":"Sensei: ")+m.c}).join("\n");
   S.chat.push({r:"user",c:text},{r:"assistant",c:""});S.busy=true;S.draft="";rerender(true);sheetRender();
-  var sys="Kamu Sensei, guru bahasa Jepang yang ramah dan santai untuk pelajar Indonesia yang belajar JFT-Basic (A2). Ngobrol seperti kakak kelas yang sabar: bahasa Indonesia sehari-hari yang hangat, langsung ke inti, tidak kaku dan tidak bertele-tele. Jawab singkat, sekitar 2 sampai 5 kalimat, kecuali murid minta penjelasan detail. Beri satu atau dua contoh Jepang lengkap dengan romaji dan arti. Jangan pakai judul, daftar bernomor, atau huruf tebal. Kalau murid salah, koreksi dengan lembut dan jelaskan alasannya. Kalau murid menulis kalimat Jepang, tanggapi maksudnya dulu, lalu bantu perbaiki. Sesekali, bukan selalu, tutup dengan pertanyaan singkat atau mini latihan. Kalau tidak yakin, katakan jujur. Kalau topiknya di luar belajar bahasa Jepang, tolak dengan sopan dan arahkan kembali.";
+  var sys="Kamu Sensei, guru bahasa Jepang yang hangat dan santai untuk pelajar Indonesia yang belajar JFT-Basic dan JLPT. Bicara seperti kakak kelas yang sabar dalam bahasa Indonesia sehari-hari. Balas dulu apa yang murid katakan, secara wajar. Sapaan dan obrolan ringan seperti \"apa kabar\" atau \"woi\" dibalas dengan ramah dalam satu atau dua kalimat, lalu boleh ajak belajar dengan santai, misalnya kenalkan cara bilang hal itu dalam bahasa Jepang. Jangan menolak, jangan menceramahi, dan jangan menyuruh murid fokus. Jangan mengulang kalimat atau ajakan yang sama dengan balasan sebelumnya. Kalau murid bertanya soal Jepang, jawab langsung dan singkat, sekitar 2 sampai 5 kalimat, kecuali diminta detail. Beri satu atau dua contoh Jepang lengkap dengan romaji dan arti, tulis romaji tanpa tanda kurung supaya enak dibacakan. Jangan pakai judul, daftar bernomor, atau huruf tebal. Kalau murid salah, koreksi dengan lembut dan jelaskan alasannya. Kalau murid menulis kalimat Jepang, tanggapi maksudnya dulu, lalu bantu perbaiki. Sesekali saja tutup dengan pertanyaan singkat, jangan setiap balasan. Kalau tidak yakin, katakan jujur. Hanya untuk permintaan yang benar-benar jauh dari belajar, seperti tugas kantor atau pekerjaan rumah mata pelajaran lain, tolak sekali dengan sopan dan tawarkan bantuan soal bahasa Jepang.";
   var bot=S.chat[S.chat.length-1];
   try{
     var sm=window.claude?await claude.use("sample"):null;
