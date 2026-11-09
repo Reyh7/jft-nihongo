@@ -1,30 +1,20 @@
 {
   "id": "/jft-nihongo/app.html",
-  "name": "NihongoGo: Belajar Jepang untuk Kerja di Jepang",
-  "short_name": "NihongoGo",
-  "description": "Aplikasi belajar bahasa Jepang untuk kamu yang ingin bekerja di Jepang: persiapan ujian JFT-Basic, kosakata, tata bahasa, dan bahasa Jepang untuk dunia kerja.",
+  "name": "ShigotoGo: Belajar Jepang untuk Kerja",
+  "short_name": "ShigotoGo",
+  "description": "Belajar bahasa Jepang dari A2 sampai N2, persiapan JFT-Basic dan JLPT, dengan AI Sensei.",
   "start_url": "./app.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0D1230",
-  "theme_color": "#0D1230",
+  "background_color": "#F5F7FB",
+  "theme_color": "#071D49",
   "lang": "id",
   "dir": "ltr",
   "categories": [
-    "education",
-    "books"
+    "education"
   ],
-  "display_override": [
-    "standalone",
-    "window-controls-overlay",
-    "minimal-ui"
-  ],
-  "launch_handler": {
-    "client_mode": "navigate-existing"
-  },
   "prefer_related_applications": false,
-  "related_applications": [],
   "shortcuts": [
     {
       "name": "Latihan Soal",
@@ -54,56 +44,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ],
-  "share_target": {
-    "action": "./app.html",
-    "method": "GET",
-    "params": {
-      "text": "q"
-    }
-  },
-  "screenshots": [
-    {
-      "src": "ss1.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Beranda dan soal harian"
-    },
-    {
-      "src": "ss2.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Latihan soal JFT-Basic"
-    },
-    {
-      "src": "ss3.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Materi pelajaran"
-    },
-    {
-      "src": "ss4.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Tanya AI Sensei"
-    },
-    {
-      "src": "ss5.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Bahasa Jepang untuk kerja"
     }
   ]
 }
