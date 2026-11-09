@@ -2190,11 +2190,21 @@ function vsPanel(){
    '<p class="kick">Gaya suara Sensei</p><div class="vs-cards"><button class="vs-c'+(q.st==="calm"?" on":"")+'" data-act="vsStyle" data-v="calm"><b lang="ja">まろやか</b><span>Tenang</span></button><button class="vs-c'+(q.st==="bright"?" on":"")+'" data-act="vsStyle" data-v="bright"><b lang="ja">明るい</b><span>Ceria</span></button></div>'+
    '<p class="kick">Suara bahasa Jepang</p><div class="vs-row"><select id="vsVoice" class="vs-sel"><option value="">Otomatis (suara terbaik di perangkat)</option>'+vs.map(function(x){return '<option value="'+esc(x.name)+'"'+(q.vn===x.name?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select><button class="btn" data-act="vsTest">▶ Coba</button></div>'+
    (vs.length?'':'<p class="muted small">Perangkat ini belum punya suara bahasa Jepang. Pasang lewat pengaturan text-to-speech.</p>')+
-   '<p class="kick">Kecepatan</p><div class="vs-seg">'+vsOpt("Rate","s","Lambat",q.rt)+vsOpt("Rate","n","Normal",q.rt)+vsOpt("Rate","f","Cepat",q.rt)+'</div>'+
+   '<p class="kick">Yang dibacakan</p><div class="vs-seg">'+vsOpt("On","all","Semua",q.on||"all")+vsOpt("On","ja","Hanya Jepang",q.on||"all")+'</div><p class="muted small">Romaji di dalam kurung tidak pernah dibacakan.</p>'+'<p class="kick">Kecepatan</p><div class="vs-seg">'+vsOpt("Rate","s","Lambat",q.rt)+vsOpt("Rate","n","Normal",q.rt)+vsOpt("Rate","f","Cepat",q.rt)+'</div>'+
    '<p class="kick">Dikte (bicara ke Sensei)</p><div class="vs-seg">'+vsOpt("Dict","id-ID","Indonesia",q.dl)+vsOpt("Dict","ja-JP","日本語",q.dl)+'</div>'+
    '<p class="muted small">Pengaturan ini berlaku untuk suara dan mikrofon AI Sensei.</p></div>';
 }
-function sayAI(t){stopRec();var qs0=VS(),segs=[];String(t).replace(/[*#`_>]/g,"").replace(/([\u3040-\u30ff\u3400-\u9fff。！？、ー]\s*)\(\s*[A-Za-zāīūēōĀĪŪĒŌ' ,.\-~]+\s*\)/g,"$1").split(/([\u3040-\u30ff\u3400-\u9fff][\u3040-\u30ff\u3400-\u9fff、。！？ー\s]*)/).forEach(function(p){if(p.trim())segs.push({t:p,jp:/[\u3040-\u30ff\u3400-\u9fff]/.test(p)})});
+function aiClean(t,only){
+  var x=String(t).replace(/[*#`_>]/g,"").replace(/([\u3040-\u30ff\u3400-\u9fff。！？、ー」』）"”]\s*)[(（]\s*[A-Za-zāīūēōĀĪŪĒŌ' ,.\-~]+\s*[)）]/g,"$1");
+  if(only==="ja"){var m=x.match(/[\u3040-\u30ff\u3400-\u9fff][\u3040-\u30ff\u3400-\u9fff、。！？ー\s]*/g);return m?m.join(" "):""}
+  return x;
+}
+function sayAI(t){stopRec();var qs0=VS(),only=qs0.on==="ja",segs=[];t=aiClean(t,only?"ja":"");if(!t.trim())return;
+  t.split(/([\u3040-\u30ff\u3400-\u9fff][\u3040-\u30ff\u3400-\u9fff、。！？ー\s]*)/).forEach(function(p){if(p.trim())segs.push({t:p,jp:/[\u3040-\u30ff\u3400-\u9fff]/.test(p)})});
+  /* Partikel pendek (は, が, を...) dibacakan sebagai romaji di dalam kalimat Indonesia, tidak jadi klip suara terpisah yang bikin jeda panjang */
+  var PR={"は":"wa","が":"ga","を":"o","に":"ni","で":"de","へ":"e","も":"mo","の":"no","と":"to","か":"ka","よ":"yo","ね":"ne","て":"te","た":"ta","な":"na","です":"desu","ます":"masu"};
+  segs.forEach(function(g){if(g.jp&&!only){var k=g.t.replace(/[\s、。！？]/g,"");if(k&&k.length<=2&&PR[k]){g.t=" "+PR[k]+" ";g.jp=false}}});
+  var mg=[];segs.forEach(function(g){var l=mg[mg.length-1];if(l&&!l.jp&&!g.jp)l.t+=g.t;else mg.push({t:g.t,jp:g.jp})});segs=mg;
   if(!segs.length||!netOn()){sayAIsys(t);return}
   try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
   var end=function(){if(S.autoTalk&&S.sopen&&!S.busy&&!S.rec)setTimeout(micStart,350)};
@@ -2237,7 +2247,7 @@ async function ask(text){
   if(!isPrem()){var d=dkey();if(P.ai.d!==d)P.ai={d:d,n:0};if(P.ai.n>=5){toast("Batas 5 pertanyaan per hari. Premium: Sensei tanpa batas.");return}P.ai.n++;save()}
   var ctx=S.chat.slice(-10).map(function(m){return(m.r==="user"?"Murid: ":"Sensei: ")+m.c}).join("\n");
   S.chat.push({r:"user",c:text},{r:"assistant",c:""});S.busy=true;S.draft="";rerender(true);sheetRender();
-  var sys="Kamu Sensei, guru bahasa Jepang yang hangat dan santai untuk pelajar Indonesia yang belajar JFT-Basic dan JLPT. Bicara seperti kakak kelas yang sabar dalam bahasa Indonesia sehari-hari. Balas dulu apa yang murid katakan, secara wajar. Sapaan dan obrolan ringan seperti \"apa kabar\" atau \"woi\" dibalas dengan ramah dalam satu atau dua kalimat, lalu boleh ajak belajar dengan santai, misalnya kenalkan cara bilang hal itu dalam bahasa Jepang. Jangan menolak, jangan menceramahi, dan jangan menyuruh murid fokus. Jangan mengulang kalimat atau ajakan yang sama dengan balasan sebelumnya. Kalau murid bertanya soal Jepang, jawab langsung dan singkat, sekitar 2 sampai 5 kalimat, kecuali diminta detail. Beri satu atau dua contoh Jepang lengkap dengan romaji dan arti, tulis romaji tanpa tanda kurung supaya enak dibacakan. Jangan pakai judul, daftar bernomor, atau huruf tebal. Kalau murid salah, koreksi dengan lembut dan jelaskan alasannya. Kalau murid menulis kalimat Jepang, tanggapi maksudnya dulu, lalu bantu perbaiki. Sesekali saja tutup dengan pertanyaan singkat, jangan setiap balasan. Kalau tidak yakin, katakan jujur. Hanya untuk permintaan yang benar-benar jauh dari belajar, seperti tugas kantor atau pekerjaan rumah mata pelajaran lain, tolak sekali dengan sopan dan tawarkan bantuan soal bahasa Jepang.";
+  var sys="Kamu Sensei, guru bahasa Jepang yang ramah untuk pemula Indonesia (level A2). Jelaskan sesederhana mungkin, seperti ke teman yang baru belajar. Pakai bahasa Indonesia sehari-hari yang pendek, tanpa istilah tata bahasa yang rumit (kalau terpaksa, jelaskan dengan kata biasa). Jawab maksimal 3 kalimat pendek. Beri hanya SATU contoh Jepang. Aturan menulis Jepang: selalu tulis kalimat Jepang dalam huruf Jepang (hiragana atau kanji), lalu romaji di dalam tanda kurung, lalu artinya, misalnya: わたしは がくせいです (watashi wa gakusei desu) artinya saya murid. Jangan pernah menulis romaji tanpa huruf Jepangnya, dan jangan menulis romaji di luar tanda kurung. Kalimat Jepang harus pendek dan umum, jangan membuat kalimat panjang atau rumit. Kalau pertanyaan murid rumit, ambil bagian paling penting saja dan tawarkan untuk lanjut. Sapaan dan obrolan ringan dibalas ramah dalam satu atau dua kalimat. Jangan menolak, jangan menceramahi, jangan mengulang balasan sebelumnya. Kalau murid menulis dalam bahasa Indonesia dan minta terjemahan Jepang, berikan satu terjemahan paling natural saja. Kalau murid salah, koreksi dengan lembut. Jangan pakai judul, daftar, atau huruf tebal. Kalau tidak yakin, katakan jujur. Hanya untuk permintaan yang jauh dari belajar (mis. tugas pelajaran lain) tolak sekali dengan sopan.";
   var bot=S.chat[S.chat.length-1];
   try{
     var sm=window.claude?await claude.use("sample"):null;
@@ -3198,6 +3208,7 @@ $("#app").addEventListener("click",function(e){
     case"nav":go(v);break;
     case"daily":startQuiz("daily");break;
     case"vsStyle":vSet("st",v);rerender(true);sayAI("こんにちは。きょうも がんばりましょう。");break;
+    case"vsOn":vSet("on",v);rerender(true);break;
     case"vsRate":vSet("rt",v);rerender(true);break;
     case"vsDict":vSet("dl",v);rerender(true);break;
     case"vsTest":sayAI("こんにちは。きょうも いっしょに がんばりましょう。");break;
