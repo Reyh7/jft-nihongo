@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.reyh7.shigotogo",
+    "sha256_cert_fingerprints": [
+      "A4:CE:6D:B2:72:2A:31:C6:E1:87:F5:67:52:48:E7:43:D5:91:6E:78:B7:07:0B:A7:BD:E1:F1:34:EA:A9:94:86"
+    ]
+  }
+}]
