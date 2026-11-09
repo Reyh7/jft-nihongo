@@ -949,6 +949,14 @@ body[data-view="roadmap"] #sfab,body[data-view="progres"] #sfab{display:none}
 .ax-note .ico{width:20px;height:20px;margin-top:2px;color:var(--accent)}
 .ax-note b{color:var(--ink)}
 @media (max-width:360px){.ax-feat{grid-template-columns:1fr}.ax-pkgs{gap:10px}.ax-pp{font-size:1.2rem}}
+
+/* ===== Sensei: teks Jepang + arti Indonesia ===== */
+.bub .sj{font-size:1rem;line-height:1.55;font-weight:600}
+.bub .st{font-size:.82rem;line-height:1.45;color:var(--ink2);margin:3px 0 10px}
+.bub .st:last-of-type,.bub .sj:last-child,.bub .sx:last-child{margin-bottom:0}
+.bub .sx{margin:0 0 6px}
+.bub .say{display:grid;margin:6px 0 0 0}
+.sh-wel .bub.sw{text-align:left;margin:6px auto 0;max-width:100%}
 </style>
 
 <script src="sensei-config.js"></script>
@@ -2143,8 +2151,8 @@ async function reg(a){try{var db=window.claude?await claude.use("db"):null,us=wi
 async function ownerList(){var el=$("#own");if(!el)return;try{var us=window.claude?await claude.use("user"):null;if(!us||!(await us.isOwner()))return;var db=await claude.use("db");if(!db)return;var sn=await db.collection("signups").get();el.innerHTML='<h3>Pendaftar ('+sn.size+')</h3>'+(sn.size?sn.docs.map(function(d){var x=d.data();return '<p class="small">'+esc(x.n)+' · '+esc(x.e)+' · '+esc(x.t)+'</p>'}).join(""):'<p class="muted small">Belum ada pendaftar.</p>');el.hidden=false}catch(e){}}
 function vSensei(){
   var qs=["Apa beda は dan が?","Jelaskan bentuk て","Kapan pakai に dan で?","Buatkan 3 soal partikel"];
-  var msgs=S.chat.map(function(m,i){var l=i===S.chat.length-1&&m.r==="assistant";return '<div class="bub '+m.r+'"'+(l?' id="lastbot"':'')+'>'+esc(m.c||"…")+'</div>'}).join("");
-  return '<header><p class="eyebrow">AI Sensei</p><h2>Tanya apa saja tentang bahasa Jepang</h2><p class="muted small">'+(isPrem()?'<span class="pbadge">PREMIUM</span> AI Sensei Unlimited':'AI Sensei: '+(5-aiLeft())+'/5 pertanyaan hari ini')+'</p></header>'+(!isPrem()&&aiLeft()<=0?lockBox('Kuota AI Sensei hari ini sudah habis.',['Pertanyaan tanpa batas','Penjelasan bahasa Indonesia','Contoh bahasa Jepang','Latihan interaktif']):'')+(isPrem()?'<button class="chip" data-act="askq" data-v="Ayo latihan percakapan (kaiwa) bahasa Jepang. Mulai dengan situasi di restoran, balas dalam bahasa Jepang sederhana.">🎤 AI Speaking / Kaiwa</button>':lockBox('AI Speaking / AI Kaiwa',['Latihan berbicara dengan AI','Percakapan situasional','Koreksi dan penjelasan']))+
+  var msgs=S.chat.map(function(m,i){var l=i===S.chat.length-1&&m.r==="assistant";return '<div class="bub '+m.r+'"'+(l?' id="lastbot"':'')+'>'+senseiBody(m)+'</div>'}).join("");
+  return '<header><p class="eyebrow">AI Sensei</p><h2>Tanya apa saja tentang bahasa Jepang</h2><p class="muted small">'+(isPrem()?'<span class="pbadge">PREMIUM</span> AI Sensei Unlimited':'AI Sensei: '+(5-aiLeft())+'/5 pertanyaan hari ini')+'</p></header>'+(!isPrem()&&aiLeft()<=0?lockBox('Kuota AI Sensei hari ini sudah habis.',['Pertanyaan tanpa batas','Arti bahasa Indonesia di setiap kalimat','Contoh bahasa Jepang','Latihan interaktif']):'')+(isPrem()?'<button class="chip" data-act="askq" data-v="Ayo latihan percakapan (kaiwa) bahasa Jepang. Mulai dengan situasi di restoran, balas dalam bahasa Jepang sederhana.">🎤 AI Speaking / Kaiwa</button>':lockBox('AI Speaking / AI Kaiwa',['Latihan berbicara dengan AI','Percakapan situasional','Koreksi dan penjelasan']))+
    '<div class="chips">'+qs.map(function(q){return '<button class="chip" data-act="askq" data-v="'+esc(q)+'">'+esc(q)+'</button>'}).join("")+'</div>'+
    '<div class="dlg">'+msgs+'</div>'+
    '<textarea id="sq" rows="2" placeholder="Ketik pertanyaan…" class="ta">'+esc(S.draft)+'</textarea>'+
@@ -2177,7 +2185,7 @@ function vsPanel(){
    '<p class="kick">Gaya suara Sensei</p><div class="vs-cards"><button class="vs-c'+(q.st==="calm"?" on":"")+'" data-act="vsStyle" data-v="calm"><b lang="ja">まろやか</b><span>Tenang</span></button><button class="vs-c'+(q.st==="bright"?" on":"")+'" data-act="vsStyle" data-v="bright"><b lang="ja">明るい</b><span>Ceria</span></button></div>'+
    '<p class="kick">Suara bahasa Jepang</p><div class="vs-row"><select id="vsVoice" class="vs-sel"><option value="">Otomatis (suara terbaik di perangkat)</option>'+vs.map(function(x){return '<option value="'+esc(x.name)+'"'+(q.vn===x.name?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select><button class="btn" data-act="vsTest">▶ Coba</button></div>'+
    (vs.length?'':'<p class="muted small">Perangkat ini belum punya suara bahasa Jepang. Pasang lewat pengaturan text-to-speech.</p>')+
-   '<p class="kick">Yang dibacakan</p><div class="vs-seg">'+vsOpt("On","all","Semua",q.on||"all")+vsOpt("On","ja","Hanya Jepang",q.on||"all")+'</div><p class="muted small">Romaji di dalam kurung tidak pernah dibacakan.</p>'+'<p class="kick">Kecepatan</p><div class="vs-seg">'+vsOpt("Rate","s","Lambat",q.rt)+vsOpt("Rate","n","Normal",q.rt)+vsOpt("Rate","f","Cepat",q.rt)+'</div>'+
+   '<p class="kick">Yang dibacakan</p><p class="muted small">Tombol speaker hanya membacakan kalimat bahasa Jepang (ja-JP). Baris “Arti:” bahasa Indonesia tidak pernah dibacakan.</p>'+'<p class="kick">Kecepatan</p><div class="vs-seg">'+vsOpt("Rate","s","Lambat",q.rt)+vsOpt("Rate","n","Normal",q.rt)+vsOpt("Rate","f","Cepat",q.rt)+'</div>'+
    '<p class="kick">Dikte (bicara ke Sensei)</p><div class="vs-seg">'+vsOpt("Dict","id-ID","Indonesia",q.dl)+vsOpt("Dict","ja-JP","日本語",q.dl)+'</div>'+
    '<p class="muted small">Pengaturan ini berlaku untuk suara dan mikrofon AI Sensei.</p></div>';
 }
@@ -2186,31 +2194,95 @@ function aiClean(t,only){
   if(only==="ja"){var m=x.match(/[\u3040-\u30ff\u3400-\u9fff][\u3040-\u30ff\u3400-\u9fff、。！？ー\s]*/g);return m?m.join(" "):""}
   return x;
 }
-function sayAI(t){stopRec();var qs0=VS(),only=qs0.on==="ja",segs=[];t=aiClean(t,only?"ja":"");if(!t.trim())return;
-  t.split(/([\u3040-\u30ff\u3400-\u9fff][\u3040-\u30ff\u3400-\u9fff、。！？ー\s]*)/).forEach(function(p){if(p.trim())segs.push({t:p,jp:/[\u3040-\u30ff\u3400-\u9fff]/.test(p)})});
-  /* Partikel pendek (は, が, を...) dibacakan sebagai romaji di dalam kalimat Indonesia, tidak jadi klip suara terpisah yang bikin jeda panjang */
-  var PR={"は":"wa","が":"ga","を":"o","に":"ni","で":"de","へ":"e","も":"mo","の":"no","と":"to","か":"ka","よ":"yo","ね":"ne","て":"te","た":"ta","な":"na","です":"desu","ます":"masu"};
-  segs.forEach(function(g){if(g.jp&&!only){var k=g.t.replace(/[\s、。！？]/g,"");if(k&&k.length<=2&&PR[k]){g.t=" "+PR[k]+" ";g.jp=false}}});
-  var mg=[];segs.forEach(function(g){var l=mg[mg.length-1];if(l&&!l.jp&&!g.jp)l.t+=g.t;else mg.push({t:g.t,jp:g.jp})});segs=mg;
-  if(!segs.length||!netOn()){sayAIsys(t);return}
+/* ---------- Sensei: pemisahan teks Jepang & arti Indonesia ---------- */
+var JA_RE=/[\u3040-\u30ff\u3400-\u9fff]/;
+var JA_RUN=/[\u3000-\u303f\u3040-\u30ff\u3400-\u9fff\uff00-\uffef々ー〜0-9]+/g;
+/* Pecah balasan Sensei menjadi bagian: ja (kalimat Jepang), tr (baris "Arti:"), tx (teks lain, mis. pesan sistem) */
+function senseiParts(t){
+  var out=[],mode="";
+  String(t==null?"":t).replace(/\r/g,"").replace(/[*#`_>]/g,"").split("\n").forEach(function(raw){
+    var l=raw.trim();
+    if(!l){mode="";return}
+    var m=l.match(/^(?:Arti|Artinya|Terjemahan)\s*[:：]\s*(.*)$/i);
+    if(m){out.push({k:"tr",t:m[1]});mode="tr";return}
+    if(mode==="tr"&&out.length&&!JA_RE.test(l)){out[out.length-1].t+=" "+l;return}
+    if(JA_RE.test(l)){out.push({k:"ja",t:l.replace(/^Sensei\s*[:：]\s*/i,"")});mode="ja";return}
+    out.push({k:"tx",t:l});mode="tx";
+  });
+  return out;
+}
+function senseiHtml(t){
+  return senseiParts(t).map(function(p){
+    if(p.k==="ja")return '<div class="sj" lang="ja">'+esc(p.t)+'</div>';
+    if(p.k==="tr")return '<div class="st">Arti: '+esc(p.t)+'</div>';
+    return '<div class="sx">'+esc(p.t)+'</div>';
+  }).join("");
+}
+function senseiBody(m){
+  if(!m.c)return "…";
+  return m.r==="assistant"?senseiHtml(m.c):esc(m.c);
+}
+/* Hanya bagian bahasa Jepang yang boleh masuk ke audio */
+function senseiJa(t){
+  var L=[];
+  senseiParts(t).forEach(function(p){
+    if(p.k!=="ja")return;
+    var x=p.t.replace(/[(（][^()（）]*[)）]/g,function(g){return JA_RE.test(g)?g:""});
+    if(/[A-Za-z]{2,}/.test(x)){var r=x.match(JA_RUN);x=r?r.join(" "):""}
+    x=x.replace(/\s+/g," ").trim();
+    if(!JA_RE.test(x))return;
+    if(!/[。！？!?]$/.test(x))x+="。";
+    L.push(x);
+  });
+  return L.join(" ");
+}
+function sayAIsys(t,end){
+  try{
+    if(!("speechSynthesis" in window))return;
+    speechSynthesis.cancel();
+    var qs=VS(),v=(qs.vn&&jaVoices().filter(function(x){return x.name===qs.vn})[0])||pickVoice("ja"),last=null;
+    (String(t).match(/[^。！？!?]+[。！？!?]*/g)||[]).forEach(function(p){
+      if(!JA_RE.test(p))return;
+      var u=new SpeechSynthesisUtterance(p.trim());
+      u.lang="ja-JP";u.rate=.85*(VS_RATE[qs.rt]||1);u.pitch=VS_PITCH[qs.st]||1;
+      if(v)u.voice=v;
+      speechSynthesis.speak(u);last=u;
+    });
+    if(last&&end){last.onend=function(){end()};last.onerror=function(){end()}}
+  }catch(e){}
+}
+function sayAI(t){
+  stopRec();
+  var ja=senseiJa(t);if(!ja)return;
   try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
   var end=function(){if(S.autoTalk&&S.sopen&&!S.busy&&!S.rec)setTimeout(micStart,350)};
-  netQueue(segs.map(function(g){return{t:g.t,l:g.jp?"ja":"id"}}),qs0.rt==="s",end,function(){sayAIsys(t)});
+  var list=netChunks(ja),slow=VS().rt==="s",tk=++NETV.tk;
+  if(!list.length)return;
+  if(!netOn()){sayAIsys(ja,end);return}
+  var au=[],mk=function(i){if(i<list.length&&!au[i]){var a=new Audio(netUrl(list[i],"ja",slow));a.preload="auto";au[i]=a}return au[i]};
+  var n=0;
+  var next=function(){
+    if(tk!==NETV.tk)return;
+    if(n>=list.length){end();return}
+    var i=n++,a=mk(i),fired=false;
+    NETV.a=a;mk(i+1);
+    /* jika satu potongan gagal, sisa kalimat dibacakan suara perangkat (ja-JP) supaya tidak terpotong */
+    var dev=function(){if(fired||tk!==NETV.tk)return;fired=true;NETV.a=null;NETV.bad++;sayAIsys(list.slice(i).join(" "),end)};
+    a.onended=function(){if(fired||tk!==NETV.tk)return;fired=true;NETV.bad=0;next()};
+    a.onerror=dev;
+    var p;try{p=a.play()}catch(e){dev();return}
+    if(p&&p.catch)p.catch(dev);
+  };
+  next();
 }
-function sayAIsys(t){try{if(!("speechSynthesis" in window))return;speechSynthesis.cancel();var vs=speechSynthesis.getVoices(),last=null;
-  String(t).replace(/[*#`_>]/g,"").split(/([\u3040-\u30ff\u3400-\u9fff][\u3040-\u30ff\u3400-\u9fff、。！？ー\s]*)/).forEach(function(p){
-    if(!p.trim())return;var jp=/[\u3040-\u30ff\u3400-\u9fff]/.test(p),u=new SpeechSynthesisUtterance(p);
-    u.lang=jp?"ja-JP":"id-ID";var qs=VS();u.rate=(jp?.85:1)*(VS_RATE[qs.rt]||1);u.pitch=VS_PITCH[qs.st]||1;
-    var v=(jp&&qs.vn&&jaVoices().filter(function(x){return x.name===qs.vn})[0])||pickVoice(jp?"ja":"id");if(v)u.voice=v;
-    speechSynthesis.speak(u);last=u});if(last&&S.autoTalk)last.onend=function(){if(S.autoTalk&&S.sopen&&!S.busy&&!S.rec&&!speechSynthesis.speaking&&!speechSynthesis.pending)setTimeout(micStart,350)}}catch(e){}}
 var ICO_SPK='<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>',ICO_MUTE='<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l4 6M21 9l-4 6"/></svg>',ICO_X='<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',ICO_SEND='<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 function sheetRender(){
   var sh=$("#ssheet");if(!sh)return;if(!S.sopen){sh.hidden=true;return}
   sh.hidden=false;
   var qs=["Apa beda は dan が?","Jelaskan bentuk て","Buatkan 3 soal partikel"];
   var body=S.chat.length?S.chat.map(function(m,i){var l=i===S.chat.length-1&&m.r==="assistant";
-    return '<div class="bub '+m.r+'"'+(l?' id="sbot"':'')+'>'+esc(m.c||"…")+(m.r==="assistant"&&m.c?' <button class="say" data-s="say" data-i="'+i+'" aria-label="Dengarkan">'+ICO_SPK+'</button>':'')+'</div>'}).join(""):
-    '<div class="sh-wel"><span class="sh-av lg">師</span><h4>こんにちは!</h4><p>Tanya apa saja tentang bahasa Jepang. Sensei akan menjawab dengan suara.</p></div><div class="sug">'+qs.map(function(q){return '<button class="chip" data-s="q" data-v="'+esc(q)+'">'+esc(q)+'</button>'}).join("")+'</div>';
+    return '<div class="bub '+m.r+'"'+(l?' id="sbot"':'')+'>'+senseiBody(m)+(m.r==="assistant"&&m.c&&senseiJa(m.c)?'<button class="say" data-s="say" data-i="'+i+'" aria-label="Dengarkan bahasa Jepang">'+ICO_SPK+'</button>':'')+'</div>'}).join(""):
+    '<div class="sh-wel"><span class="sh-av lg">師</span><div class="bub assistant sw"><div class="sj" lang="ja">こんにちは！今日は何を勉強しますか？</div><div class="st">Arti: Halo! Hari ini mau belajar apa?</div><button class="say" data-s="hello" aria-label="Dengarkan bahasa Jepang">'+ICO_SPK+'</button></div></div><div class="sug">'+qs.map(function(q){return '<button class="chip" data-s="q" data-v="'+esc(q)+'">'+esc(q)+'</button>'}).join("")+'</div>';
   sh.innerHTML='<div class="sh-h"><span class="sh-av">師</span><div class="sh-t"><b>AI Sensei</b><span><i class="dot"></i>'+(isPrem()?"Tanpa batas":"Sisa "+aiLeft()+" pertanyaan")+'</span></div><button class="sh-talk'+(S.autoTalk?" on":"")+'" data-s="talk" aria-label="Mode obrol suara">Obrol</button><button class="sh-ib" data-s="voice" aria-label="Suara Sensei">'+(S.svoice?ICO_SPK:ICO_MUTE)+'</button><button class="sh-ib" data-s="close" aria-label="Tutup">'+ICO_X+'</button></div>'+
     '<div class="sh-b">'+body+'</div><div class="sh-f"><button class="sh-lang" data-s="lang" aria-label="Bahasa suara">'+((S.slang||VS().dl)==="ja-JP"?"日本語":"ID")+'</button><textarea id="sq2" rows="1" class="ta sh-ta" placeholder="'+(S.listening?"Mendengarkan…":"Tanya Sensei…")+'">'+esc(S.draft2)+'</textarea><button class="sh-mic'+(S.listening?" on":"")+'" data-s="mic" aria-label="Bicara">'+ICO_MIC+'</button><button class="sh-send" data-s="send" aria-label="Kirim"'+(S.busy?" disabled":"")+'>'+ICO_SEND+'</button></div>';
   var b=sh.querySelector(".sh-b");b.scrollTop=b.scrollHeight;
@@ -2224,21 +2296,38 @@ function mountSensei(){
     if(a==="close"){micStop();S.autoTalk=false;S.sopen=false;sheetRender()}
     else if(a==="voice"){S.svoice=!S.svoice;if(!S.svoice&&window.speechSynthesis)speechSynthesis.cancel();sheetRender()}
     else if(a==="mic"){micStart()}else if(a==="lang"){S.slang=(S.slang||VS().dl)==="ja-JP"?"id-ID":"ja-JP";VS().dl=S.slang;save();toast((S.slang==="ja-JP")?"Mikrofon mendengar bahasa Jepang":"Mikrofon mendengar bahasa Indonesia");sheetRender()}else if(a==="talk"){S.autoTalk=!S.autoTalk;if(S.autoTalk){S.svoice=true;if(!S.busy)micStart()}else micStop();sheetRender()}else if(a==="send"){var t=$("#sq2");S.draft2="";ask(t?t.value:"")}
-    else if(a==="say")sayAI(S.chat[Number(b.getAttribute("data-i"))].c);
+    else if(a==="say"){var mm=S.chat[Number(b.getAttribute("data-i"))];if(mm)sayAI(mm.c)}
+    else if(a==="hello")sayAI("こんにちは！今日は何を勉強しますか？");
     else if(a==="q")ask(b.getAttribute("data-v"))});
   sh.addEventListener("input",function(e){if(e.target.id==="sq2")S.draft2=e.target.value});
 }
 function refundAI(){if(!isPrem()&&P.ai&&P.ai.n>0){P.ai.n--;save()}}
+function senseiLevel(){
+  var id="a2";try{var r=recLevel();if(r&&r.id)id=String(r.id).toLowerCase()}catch(e){}
+  return{a2:"A2 (JFT-Basic)",n5:"N5",n4:"N4",n3:"N3",n2:"N2"}[id]||id.toUpperCase();
+}
+function senseiSys(){
+  var lv=senseiLevel();
+  return "Kamu adalah Sensei, guru bahasa Jepang yang ramah dan sabar di aplikasi ShigotoGo untuk murid Indonesia. Level murid saat ini: "+lv+".\n"+
+  "ATURAN BAHASA: Kamu HARUS berbicara dalam bahasa Jepang yang alami, sopan (bentuk です/ます), dan mudah dipahami. Jangan memakai bahasa Indonesia untuk kalimat percakapanmu. Jangan menulis romaji.\n"+
+  "TINGKAT BAHASA: Sesuaikan dengan level murid. A2/N5: kalimat sangat pendek, kosakata dan tata bahasa dasar, dominan hiragana, kanji hanya yang paling dasar. N4: kalimat sederhana, boleh bentuk て, たい, から, ので. N3: kalimat lebih natural, kanji umum, pola menengah. N2: kalimat natural dan lebih kaya, ungkapan formal, keigo dasar. Kalau murid menulis dengan tingkat yang jelas lebih mudah atau lebih sulit, sesuaikan. Murid pemula: kosakata dan tata bahasa sederhana saja.\n"+
+  "FORMAT WAJIB: Setiap kalimat Jepang harus diikuti baris terjemahan Indonesia tepat di bawahnya, dengan awalan \"Arti:\". Terjemahan hanya teks bantuan, bukan ucapanmu. Pisahkan tiap pasangan dengan satu baris kosong. Jangan menulis kalimat Indonesia di luar baris \"Arti:\". Jangan pakai judul, daftar, tanda bintang, atau huruf tebal. Contoh format persis:\n"+
+  "こんにちは！今日は何を勉強しますか？\n"+
+  "Arti: Halo! Hari ini mau belajar apa?\n\n"+
+  "とてもいいですね！\n"+
+  "Arti: Bagus sekali!\n"+
+  "CARA MENGAJAR: Ajak murid berbicara dalam bahasa Jepang. Kalau murid salah, koreksi dengan lembut dalam bahasa Jepang (tulis kalimat yang benar), lalu beri arti koreksinya di baris \"Arti:\". Beri satu contoh kalimat yang relevan. Jawaban jangan panjang: maksimal 3 sampai 4 kalimat Jepang pendek, masing-masing dengan baris \"Arti:\". Akhiri dengan SATU pertanyaan lanjutan dalam bahasa Jepang agar murid terbiasa berpikir dalam bahasa Jepang. Kalau murid bertanya dalam bahasa Indonesia, tetap jawab dalam bahasa Jepang dengan Arti. Kalau murid meminta terjemahan, beri satu terjemahan paling natural dalam bahasa Jepang dengan Arti. Kalau tidak yakin, katakan jujur dalam bahasa Jepang sederhana. Hanya untuk permintaan yang jauh dari belajar bahasa Jepang, tolak sekali dengan sopan dalam bahasa Jepang (dengan Arti) lalu ajak kembali belajar.";
+}
 async function ask(text){
   text=(text||"").trim();if(!text||S.busy)return;
   if(!isPrem()){var d=dkey();if(P.ai.d!==d)P.ai={d:d,n:0};if(P.ai.n>=5){toast("Batas 5 pertanyaan per hari. Premium: Sensei tanpa batas.");return}P.ai.n++;save()}
   var ctx=S.chat.slice(-10).map(function(m){return(m.r==="user"?"Murid: ":"Sensei: ")+m.c}).join("\n");
   S.chat.push({r:"user",c:text},{r:"assistant",c:""});S.busy=true;S.draft="";rerender(true);sheetRender();
-  var sys="Kamu Sensei, guru bahasa Jepang yang ramah untuk pemula Indonesia (level A2). Jelaskan sesederhana mungkin, seperti ke teman yang baru belajar. Pakai bahasa Indonesia sehari-hari yang pendek, tanpa istilah tata bahasa yang rumit (kalau terpaksa, jelaskan dengan kata biasa). Jawab maksimal 3 kalimat pendek. Beri hanya SATU contoh Jepang. Aturan menulis Jepang: selalu tulis kalimat Jepang dalam huruf Jepang (hiragana atau kanji), lalu romaji di dalam tanda kurung, lalu artinya, misalnya: わたしは がくせいです (watashi wa gakusei desu) artinya saya murid. Jangan pernah menulis romaji tanpa huruf Jepangnya, dan jangan menulis romaji di luar tanda kurung. Kalimat Jepang harus pendek dan umum, jangan membuat kalimat panjang atau rumit. Kalau pertanyaan murid rumit, ambil bagian paling penting saja dan tawarkan untuk lanjut. Sapaan dan obrolan ringan dibalas ramah dalam satu atau dua kalimat. Jangan menolak, jangan menceramahi, jangan mengulang balasan sebelumnya. Kalau murid menulis dalam bahasa Indonesia dan minta terjemahan Jepang, berikan satu terjemahan paling natural saja. Kalau murid salah, koreksi dengan lembut. Jangan pakai judul, daftar, atau huruf tebal. Kalau tidak yakin, katakan jujur. Hanya untuk permintaan yang jauh dari belajar (mis. tugas pelajaran lain) tolak sekali dengan sopan.";
+  var sys=senseiSys();
   var bot=S.chat[S.chat.length-1];
   try{
     var sm=window.claude?await claude.use("sample"):null;
-    if(!sm){if(!window.SENSEI_URL)window.SENSEI_URL="https://sensi.rttyhhh934.workers.dev";var tk="";try{tk=window.__fbToken?await window.__fbToken():""}catch(x){}var hd={"Content-Type":"application/json"};if(tk)hd.Authorization="Bearer "+tk;var rs=await fetch(window.SENSEI_URL,{method:"POST",headers:hd,body:JSON.stringify({system:sys,prompt:ctx+"\nMurid: "+text+"\nSensei:"})});var js={};try{js=await rs.json()}catch(x){js={error:"bukan-json"}}if(!rs.ok||!js.text)throw new Error("server "+rs.status+" "+(js.error||"kosong"));bot.c=js.text}else await sm(sys+"\n\n"+ctx+"\nMurid: "+text+"\nSensei:",{cache:false,onText:function(o){bot.c=o.text;var el=$("#lastbot");if(el)el.textContent=o.text;var e2=$("#sbot");if(e2)e2.textContent=o.text}});
+    if(!sm){if(!window.SENSEI_URL)window.SENSEI_URL="https://sensi.rttyhhh934.workers.dev";var tk="";try{tk=window.__fbToken?await window.__fbToken():""}catch(x){}var hd={"Content-Type":"application/json"};if(tk)hd.Authorization="Bearer "+tk;var rs=await fetch(window.SENSEI_URL,{method:"POST",headers:hd,body:JSON.stringify({system:sys,prompt:ctx+"\nMurid: "+text+"\nSensei:"})});var js={};try{js=await rs.json()}catch(x){js={error:"bukan-json"}}if(!rs.ok||!js.text)throw new Error("server "+rs.status+" "+(js.error||"kosong"));bot.c=js.text}else await sm(sys+"\n\n"+ctx+"\nMurid: "+text+"\nSensei:",{cache:false,onText:function(o){bot.c=o.text;var el=$("#lastbot");if(el)el.innerHTML=senseiHtml(o.text);var e2=$("#sbot");if(e2)e2.innerHTML=senseiHtml(o.text)}});
   }catch(e){var em=(e&&e.message)||"galat";if(!bot.c)refundAI();bot.c=bot.c||(em==="na"?"Sensei belum tersambung ke server (SENSEI_URL kosong). Pemilik situs perlu memasang server dan mengisi sensei-config.js.":("Sensei belum bisa dihubungi (kode: "+em+"). Servernya belum dipasang atau sedang bermasalah."))}
   S.busy=false;if(cur()==="sensei")rerender(true);sheetRender();if(S.svoice&&bot.c)sayAI(bot.c);if(S.autoTalk&&S.sopen&&!(S.svoice&&bot.c))setTimeout(micStart,400);
 }
