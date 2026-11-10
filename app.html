@@ -957,6 +957,11 @@ body[data-view="roadmap"] #sfab,body[data-view="progres"] #sfab{display:none}
 .bub .sx{margin:0 0 6px}
 .bub .say{display:grid;margin:6px 0 0 0}
 .sh-wel .bub.sw{text-align:left;margin:6px auto 0;max-width:100%}
+/* Sorotan kalimat Jepang yang sedang dibacakan Sensei */
+.bub .sj .ss{border-radius:5px;padding:1px 2px;margin:0 -2px;transition:color .2s,background-color .2s;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.bub .sj .ss.rd{color:var(--red)}
+.bub .sj .ss.now{background:var(--soft)}
+.bub .sj .ss .rp{color:var(--red)}
 </style>
 
 <script src="sensei-config.js"></script>
@@ -2211,9 +2216,52 @@ function senseiParts(t){
   });
   return out;
 }
+/* ---------- Sensei: sorot teks Jepang yang sedang dibacakan ---------- */
+var HL={on:false,h:"",u:-1,f:0,tk:0,raf:0};
+function hk(s){var h=5381;s=String(s);for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return(h>>>0).toString(36)}
+function jaSay(x){
+  x=x.replace(/[(（][^()（）]*[)）]/g,function(g){return JA_RE.test(g)?g:""});
+  if(/[A-Za-z]{2,}/.test(x)){var r=x.match(JA_RUN);x=r?r.join(" "):""}
+  x=x.replace(/\s+/g," ").trim();
+  if(!JA_RE.test(x))return"";
+  if(!/[。！？!?]$/.test(x))x+="。";
+  return x;
+}
+/* Pecah tiap baris Jepang jadi kalimat; kalimat yang dibacakan diberi nomor u */
+function senseiSegs(t){
+  var parts=senseiParts(t),units=[];
+  parts.forEach(function(p){
+    if(p.k!=="ja")return;
+    p.segs=(p.t.match(/[^。！？!?]+[。！？!?]*|[。！？!?]+/g)||[p.t]).map(function(d){
+      var s=jaSay(d),g={d:d,u:-1};
+      if(s){g.u=units.length;g.say=s;units.push(g)}
+      return g;
+    });
+  });
+  return{parts:parts,units:units,key:hk(units.map(function(g){return g.say}).join("|"))};
+}
+function hlCls(h,u){return HL.on&&HL.h===h?(u<HL.u?" rd":(u===HL.u?" now":"")):""}
+function hlInner(h,u,d){
+  if(HL.on&&HL.h===h&&u===HL.u){var n=Math.round(Math.max(0,Math.min(1,HL.f))*d.length);return'<span class="rp">'+esc(d.slice(0,n))+'</span>'+esc(d.slice(n))}
+  return esc(d);
+}
+function hlPaint(scroll){
+  var els=document.querySelectorAll(".sj .ss");
+  for(var i=0;i<els.length;i++){
+    var el=els[i],h=el.parentNode.getAttribute("data-h"),u=+el.getAttribute("data-u"),d=el.textContent,c=hlCls(h,u);
+    var n=c===" now"?Math.round(Math.max(0,Math.min(1,HL.f))*d.length):-1,k=c+"|"+n;
+    if(el._k!==k){el._k=k;el.className="ss"+c;el.innerHTML=hlInner(h,u,d)}
+    if(scroll&&c===" now"&&el.offsetParent!==null){try{el.scrollIntoView({block:"nearest",behavior:"smooth"})}catch(e){}}
+  }
+}
+function hlSet(h,u,f){var ch=!HL.on||HL.h!==h||HL.u!==u;HL.on=true;HL.h=h;HL.u=u;HL.f=f;hlPaint(ch)}
+function hlClear(){cancelAnimationFrame(HL.raf);if(!HL.on)return;HL.on=false;HL.h="";HL.u=-1;HL.f=0;hlPaint(false)}
 function senseiHtml(t){
-  return senseiParts(t).map(function(p){
-    if(p.k==="ja")return '<div class="sj" lang="ja">'+esc(p.t)+'</div>';
+  var G=senseiSegs(t);
+  return G.parts.map(function(p){
+    if(p.k==="ja")return '<div class="sj" lang="ja" data-h="'+G.key+'">'+p.segs.map(function(g){
+      return g.u<0?esc(g.d):'<span class="ss'+hlCls(G.key,g.u)+'" data-u="'+g.u+'">'+hlInner(G.key,g.u,g.d)+'</span>';
+    }).join("")+'</div>';
     if(p.k==="tr")return '<div class="st">Arti: '+esc(p.t)+'</div>';
     return '<div class="sx">'+esc(p.t)+'</div>';
   }).join("");
@@ -2236,38 +2284,66 @@ function senseiJa(t){
   });
   return L.join(" ");
 }
-function sayAIsys(t,end){
+function sayAIsys(G,from,end,htk){
   try{
     if(!("speechSynthesis" in window))return;
     speechSynthesis.cancel();
-    var qs=VS(),v=(qs.vn&&jaVoices().filter(function(x){return x.name===qs.vn})[0])||pickVoice("ja"),last=null;
-    (String(t).match(/[^。！？!?]+[。！？!?]*/g)||[]).forEach(function(p){
-      if(!JA_RE.test(p))return;
-      var u=new SpeechSynthesisUtterance(p.trim());
-      u.lang="ja-JP";u.rate=.85*(VS_RATE[qs.rt]||1);u.pitch=VS_PITCH[qs.st]||1;
+    var qs=VS(),v=(qs.vn&&jaVoices().filter(function(x){return x.name===qs.vn})[0])||pickVoice("ja"),rate=.85*(VS_RATE[qs.rt]||1),us=G.units.slice(from);
+    var fin=function(){if(htk===HL.tk)hlClear();if(end)end()};
+    if(htk===HL.tk&&us.length)hlSet(G.key,us[0].u,0);
+    us.forEach(function(g,i){
+      var u=new SpeechSynthesisUtterance(g.say),gotB=false;
+      u.lang="ja-JP";u.rate=rate;u.pitch=VS_PITCH[qs.st]||1;
       if(v)u.voice=v;
-      speechSynthesis.speak(u);last=u;
+      u.onstart=function(){
+        if(htk!==HL.tk)return;
+        hlSet(G.key,g.u,0);
+        var t0=performance.now(),dur=Math.max(600,g.say.length*160/rate);
+        cancelAnimationFrame(HL.raf);
+        (function lp(){
+          if(htk!==HL.tk||HL.u!==g.u)return;
+          if(!gotB){HL.f=Math.min(.95,(performance.now()-t0)/dur);hlPaint(false)}
+          HL.raf=requestAnimationFrame(lp);
+        })();
+      };
+      u.onboundary=function(e){
+        if(htk!==HL.tk||HL.u!==g.u||typeof e.charIndex!=="number")return;
+        gotB=true;HL.f=Math.min(1,e.charIndex/g.say.length);hlPaint(false);
+      };
+      if(i===us.length-1){u.onend=fin;u.onerror=fin}
+      else u.onerror=function(e){if(htk===HL.tk&&/cancel|interrupt/.test((e&&e.error)||""))hlClear()};
+      speechSynthesis.speak(u);
     });
-    if(last&&end){last.onend=function(){end()};last.onerror=function(){end()}}
   }catch(e){}
 }
 function sayAI(t){
   stopRec();
-  var ja=senseiJa(t);if(!ja)return;
+  var G=senseiSegs(t),ja=senseiJa(t);if(!ja||!G.units.length)return;
   try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
+  hlClear();var htk=++HL.tk;
   var end=function(){if(S.autoTalk&&S.sopen&&!S.busy&&!S.rec)setTimeout(micStart,350)};
-  var list=netChunks(ja),slow=VS().rt==="s",tk=++NETV.tk;
+  var slow=VS().rt==="s",tk=++NETV.tk,list=[];
+  /* satu kalimat = satu (atau beberapa) potongan audio, supaya sorotan tahu kalimat mana yang sedang bunyi */
+  G.units.forEach(function(g){var tot=g.say.length,off=0;netChunks(g.say).forEach(function(c){list.push({t:c,u:g.u,off:off,len:c.length,tot:tot});off+=c.length})});
   if(!list.length)return;
-  if(!netOn()){sayAIsys(ja,end);return}
-  var au=[],mk=function(i){if(i<list.length&&!au[i]){var a=new Audio(netUrl(list[i],"ja",slow));a.preload="auto";au[i]=a}return au[i]};
+  if(!netOn()){sayAIsys(G,0,end,htk);return}
+  var au=[],mk=function(i){if(i<list.length&&!au[i]){var a=new Audio(netUrl(list[i].t,"ja",slow));a.preload="auto";au[i]=a}return au[i]};
   var n=0;
   var next=function(){
     if(tk!==NETV.tk)return;
-    if(n>=list.length){end();return}
-    var i=n++,a=mk(i),fired=false;
-    NETV.a=a;mk(i+1);
+    if(n>=list.length){if(htk===HL.tk)hlClear();end();return}
+    var i=n++,a=mk(i),it=list[i],fired=false;
+    NETV.a=a;mk(i+1);mk(i+2);
+    hlSet(G.key,it.u,it.off/it.tot);
+    (function lp(){
+      if(fired||htk!==HL.tk)return;
+      if(tk!==NETV.tk){hlClear();return}
+      var r=(isFinite(a.duration)&&a.duration>0)?a.currentTime/a.duration:0;
+      HL.f=Math.min(1,(it.off+r*it.len)/it.tot);hlPaint(false);
+      HL.raf=requestAnimationFrame(lp);
+    })();
     /* jika satu potongan gagal, sisa kalimat dibacakan suara perangkat (ja-JP) supaya tidak terpotong */
-    var dev=function(){if(fired||tk!==NETV.tk)return;fired=true;NETV.a=null;NETV.bad++;sayAIsys(list.slice(i).join(" "),end)};
+    var dev=function(){if(fired||tk!==NETV.tk)return;fired=true;NETV.a=null;NETV.bad++;sayAIsys(G,it.u,end,htk)};
     a.onended=function(){if(fired||tk!==NETV.tk)return;fired=true;NETV.bad=0;next()};
     a.onerror=dev;
     var p;try{p=a.play()}catch(e){dev();return}
@@ -2282,7 +2358,7 @@ function sheetRender(){
   var qs=["Apa beda は dan が?","Jelaskan bentuk て","Buatkan 3 soal partikel"];
   var body=S.chat.length?S.chat.map(function(m,i){var l=i===S.chat.length-1&&m.r==="assistant";
     return '<div class="bub '+m.r+'"'+(l?' id="sbot"':'')+'>'+senseiBody(m)+(m.r==="assistant"&&m.c&&senseiJa(m.c)?'<button class="say" data-s="say" data-i="'+i+'" aria-label="Dengarkan bahasa Jepang">'+ICO_SPK+'</button>':'')+'</div>'}).join(""):
-    '<div class="sh-wel"><span class="sh-av lg">師</span><div class="bub assistant sw"><div class="sj" lang="ja">こんにちは！今日は何を勉強しますか？</div><div class="st">Arti: Halo! Hari ini mau belajar apa?</div><button class="say" data-s="hello" aria-label="Dengarkan bahasa Jepang">'+ICO_SPK+'</button></div></div><div class="sug">'+qs.map(function(q){return '<button class="chip" data-s="q" data-v="'+esc(q)+'">'+esc(q)+'</button>'}).join("")+'</div>';
+    '<div class="sh-wel"><span class="sh-av lg">師</span><div class="bub assistant sw">'+senseiHtml("こんにちは！今日は何を勉強しますか？")+'<div class="st">Arti: Halo! Hari ini mau belajar apa?</div><button class="say" data-s="hello" aria-label="Dengarkan bahasa Jepang">'+ICO_SPK+'</button></div></div><div class="sug">'+qs.map(function(q){return '<button class="chip" data-s="q" data-v="'+esc(q)+'">'+esc(q)+'</button>'}).join("")+'</div>';
   sh.innerHTML='<div class="sh-h"><span class="sh-av">師</span><div class="sh-t"><b>AI Sensei</b><span><i class="dot"></i>'+(isPrem()?"Tanpa batas":"Sisa "+aiLeft()+" pertanyaan")+'</span></div><button class="sh-talk'+(S.autoTalk?" on":"")+'" data-s="talk" aria-label="Mode obrol suara">Obrol</button><button class="sh-ib" data-s="voice" aria-label="Suara Sensei">'+(S.svoice?ICO_SPK:ICO_MUTE)+'</button><button class="sh-ib" data-s="close" aria-label="Tutup">'+ICO_X+'</button></div>'+
     '<div class="sh-b">'+body+'</div><div class="sh-f"><button class="sh-lang" data-s="lang" aria-label="Bahasa suara">'+((S.slang||VS().dl)==="ja-JP"?"日本語":"ID")+'</button><textarea id="sq2" rows="1" class="ta sh-ta" placeholder="'+(S.listening?"Mendengarkan…":"Tanya Sensei…")+'">'+esc(S.draft2)+'</textarea><button class="sh-mic'+(S.listening?" on":"")+'" data-s="mic" aria-label="Bicara">'+ICO_MIC+'</button><button class="sh-send" data-s="send" aria-label="Kirim"'+(S.busy?" disabled":"")+'>'+ICO_SEND+'</button></div>';
   var b=sh.querySelector(".sh-b");b.scrollTop=b.scrollHeight;
