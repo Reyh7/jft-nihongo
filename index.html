@@ -1,1 +1,41 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ShigotoGo</title><meta name="theme-color" content="#071D49"><meta http-equiv="refresh" content="0;url=app.html"><script>location.replace("app.html"+location.search+location.hash)</script></head><body style="font-family:sans-serif;background:#071D49;color:#fff;text-align:center;padding:40px"><p>Membuka ShigotoGo... <a href="app.html" style="color:#fff">Klik di sini</a> jika tidak berpindah.</p></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="refresh" content="0; url=./app.html">
+  <title>ShigotoGo</title>
+  <meta name="theme-color" content="#071D49">
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #f1f3f9;
+      color: #1a2246;
+      font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+    }
+    .box {
+      text-align: center;
+      padding: 24px;
+    }
+    a {
+      color: #2a3a8f;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <p>Memindahkan ke aplikasi ShigotoGo...</p>
+    <a href="./app.html">Buka aplikasi</a>
+  </div>
+  <script>
+    window.location.replace('./app.html');
+  </script>
+</body>
+</html>
